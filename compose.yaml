@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+
+  alloy:
+    image: grafana/alloy:v1.8.1
+    ports:
+      - 12345:12345 # HTTP server for Alloy
+      - 4317:4317   # gRPC endpoint for OpenTelemetry
+      - 4318:4318   # HTTP endpoint for OpenTelemetry
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy # Mount Alloy configuration
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    depends_on:
+      - loki
+
+  init:
+    image: &tempoImage grafana/tempo:latest
+    user: root
+    entrypoint:
+      - "chown"
+      - "10001:10001"
+      - "/var/tempo"
+    volumes:
+      - tempo-data:/var/tempo
+
+  tempo:
+    image: *tempoImage
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+      - tempo-data:/var/tempo
+    ports:
+      - "3200" # tempo
+    depends_on:
+      - init
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+      - --enable-feature=native-histograms
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus.yaml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:12.0.1
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    ports:
+      - "3333:3000"
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki.yaml:/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+
+volumes:
+  tempo-data:
