@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@opentelemetry/instrumentation-winston": "^0.47.0",
-    "@opentelemetry/winston-transport": "^0.13.0"
-  }
-}

@@ -1,9 +1,26 @@
 import fastify from 'fastify'
-import { fastifyOtelInstrumentation } from './instrumentation'
-import { log } from './log';
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
+import { routes } from './auth/routes';
+import fastifyMultipart from '@fastify/multipart'
+import fastifyJwt from '@fastify/jwt'
+import { fastifyOtelInstrumentation, sdk } from './instrumentation'
+import gracefulShutdown from 'http-graceful-shutdown'
+import { pool } from './db';
 
-const app = fastify();
+sdk.start()
+
+export const app = fastify({ logger: true });
 await app.register(fastifyOtelInstrumentation.plugin());
+await app.register(fastifyMultipart)
+await app.register(fastifyJwt, {
+    secret: {
+        public: process.env.AUTH_JWT_PUBLIC_KEY!,
+        private: process.env.AUTH_JWT_PRIVATE_KEY!,
+    },
+})
+
+app.setValidatorCompiler(validatorCompiler)
+app.setSerializerCompiler(serializerCompiler)
 
 app.addHook('onRequest', (req, reply, done) => {
     const { inject } = req.opentelemetry()
@@ -16,17 +33,23 @@ app.addHook('onRequest', (req, reply, done) => {
     done()
 })
 
-app.get("/", () => {
-    log.info("ping!")
-    return {
-        foo: "bar"
+await app.register(routes)
+
+app.listen({ port: process.env.AUTH_PORT ? parseInt(process.env.AUTH_PORT) : 8080 }, (err) => {
+    if (err) {
+        app.log.error(err)
+        process.exit(1)
     }
 })
 
-app.listen({ port: 8080 }, (err, address) => {
-    if (err) {
-        console.error(err)
-        process.exit(1)
+gracefulShutdown(app.server,
+    {
+        onShutdown: async function () {
+            app.log.info("Shutting down...")
+            await pool.end()
+        },
+        finally: function () {
+            app.log.info('Server graceful shut down completed.');
+        }
     }
-    log.info(`Server listening at ${address}`, { address })
-})
+);
