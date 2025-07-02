@@ -2,4 +2,5 @@
 _.file = '.env'
 
 [tools]
-atlas = "latest"
+atlas = "v0.35.0"
+mc = "2025-05-21T01-59-54Z"

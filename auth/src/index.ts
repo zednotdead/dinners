@@ -17,7 +17,7 @@ export const app = fastify({
     transport: {
       targets: [
         {
-          target: process.env.NODE_ENV === 'dev' ? 'pino-pretty' : 'pino/file',
+          target: process.env.NODE_ENV === 'development' ? 'pino-pretty' : 'pino/file',
           options: { destination: 1 },
         },
       ],
@@ -38,7 +38,7 @@ export const app = fastify({
 });
 
 await app.register(fastifyOtelInstrumentation.plugin());
-await app.register(fastifyMultipart);
+await app.register(fastifyMultipart, { attachFieldsToBody: true });
 await app.register(authenticatePlugin);
 
 app.setValidatorCompiler(validatorCompiler);

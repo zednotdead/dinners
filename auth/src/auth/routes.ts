@@ -1,9 +1,7 @@
-import type { MultipartFields } from '@fastify/multipart';
-import { pipeline } from 'node:stream/promises';
-import { createWriteStream } from 'node:fs';
-import { UpdateUserDTO, type UpdateUserDTOType } from './dto/update-user-dto';
+import type { Multipart, MultipartFields } from '@fastify/multipart';
+import { UpdateUserDTO } from './dto/update-user-dto';
 import { CreateUserDTO } from './dto/create-user-dto';
-import { UserDataDTO } from './dto/user-data-dto';
+import { UserDataDTO, type UserDataDTOType } from './dto/user-data-dto';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { db } from '../db';
 import { users } from './schema/user';
@@ -19,6 +17,8 @@ import { valkey } from '../cache';
 import { BaseMessageDTO } from './dto/base-message-dto';
 import { InvalidPasswordError, UserHasNoPasswordError, UserNotFoundError } from './errors/login';
 import { LoginResponseDTO } from './dto/login-response-dto';
+import { s3 } from '../s3';
+import { type MultipartFileType } from './dto/multipart-file';
 
 export const routes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.post('/', {
@@ -122,6 +122,26 @@ export const routes: FastifyPluginAsyncZod = async (fastify) => {
     return user;
   });
 
+  fastify.get<{ Params: { userId: string } }>(
+    '/:userId',
+    { onRequest: [fastify.authenticate] },
+    async function getUser(req) {
+      const { userId } = req.params;
+      const userPossible = await db.select().from(users).where(eq(users.id, userId)).execute();
+      const user = UserDataDTO.parse(userPossible[0]);
+
+      return user;
+    },
+  );
+
+  fastify.get('/list', { onRequest: [fastify.authenticate] }, async () => {
+    const userPossible = await db.select().from(users).execute();
+    return userPossible
+      .map((u) => UserDataDTO.safeParse(u))
+      .filter((u) => u.success === true)
+      .map((u) => u.data);
+  });
+
   fastify.post(
     '/logout',
     {
@@ -146,32 +166,78 @@ export const routes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.route({
     method: 'PUT',
     url: '/',
-    handler: async (req) => {
-      const data = await req.file();
-      const user = getUserFromMultipart(data?.fields);
+    onRequest: [fastify.authenticate],
+    handler: async (req, res) => {
+      const userUpdate = getUserFromMultipart(req.body);
+      const userPossible = await db.select().from(users).where(eq(users.id, req.user.id)).execute();
+      const user = userPossible[0];
+      const updateObj: Partial<UserDataDTOType> = { ...userUpdate, avatar: undefined };
 
-      if (user?.avatar) {
-        await pipeline(user.avatar, createWriteStream('OUTPUT.png'));
+      if (!user) {
+        throw new Error('No user to update');
       }
 
-      return req.body;
+      if (userUpdate?.avatar === '') {
+        req.log.debug('Clearing user\'s avatar');
+        try {
+          req.log.debug(`Deleting file avatar/${user.id}`);
+          await s3.delete(`avatar/${user.id}`);
+        } catch {
+          req.log.error(`Could not delete file avatar/${user.id}, delete it manually`, user);
+        }
+        updateObj.avatar = null;
+      } else if (userUpdate.avatar) {
+        req.log.debug('Writing a new avatar to S3');
+        const userAvatar = s3.file(`avatar/${user.id}`, { type: userUpdate.avatar.metadata.mimetype });
+        const writer = userAvatar.writer({
+          retry: 3,
+          queueSize: 10,
+          partSize: 5 * 1024 * 1024,
+        });
+
+        for await (const chunk of userUpdate.avatar.file) {
+          writer.write(chunk);
+        }
+
+        await writer.end();
+        updateObj.avatar = userAvatar.name;
+      }
+
+      if (Object.keys({ ...updateObj, ...userUpdate }).length > 0) {
+        const updatedUser = await db
+          .update(users)
+          .set(updateObj)
+          .where(eq(users.id, user.id))
+          .returning()
+          .execute();
+
+        res.status(200).send(UserDataDTO.parse(updatedUser[0]));
+      }
+
+      res.status(304);
     },
   });
 };
 
 const getUserFromMultipart = (fields: unknown = {}) => {
-  const user: Record<string, unknown> = {};
-  const updateUserKeys: (keyof UpdateUserDTOType)[] = ['avatar'];
+  const user: Record<string, string | MultipartFileType> = {};
+  const updateUserKeys = Object.keys(fields as MultipartFields);
 
   updateUserKeys.forEach((k) => {
     const f = (fields as Record<string, MultipartFields>)[k];
-    const fieldValue = Array.isArray(f) ? f[0] : f;
+    const fieldValue: Multipart = Array.isArray(f) ? f[0] : f;
 
     if (fieldValue) {
       if (fieldValue.type === 'field') {
-        user[k] = fieldValue.value;
+        user[k] = fieldValue.value as string;
       } else {
-        user[k] = fieldValue.file;
+        user[k] = {
+          file: fieldValue.file,
+          metadata: {
+            filename: fieldValue.filename,
+            mimetype: fieldValue.mimetype,
+          },
+        };
       }
     }
   });
