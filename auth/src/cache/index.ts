@@ -1,3 +1,3 @@
-import Valkey from "iovalkey"
+import Valkey from 'iovalkey';
 
 export const valkey = new Valkey();

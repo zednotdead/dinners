@@ -1,20 +1,22 @@
-import { z } from "zod/v4";
+import { z } from 'zod/v4';
 
 export const BaseErrorDTO = z.object({
-    code: z.number().positive(),
-    message: z.string(),
-})
+  code: z.number().positive(),
+  message: z.string(),
+});
 
-export class BaseError {
-    constructor(
-        public statusCode: number,
-        public message: string,
-    ) {}
+export class BaseError extends Error {
+  constructor(
+    public statusCode: number,
+    public override message: string,
+  ) {
+    super(message);
+  }
 
-    public getResponse() {
-        return {
-            code: this.statusCode,
-            message: this.message,
-        }
-    }
+  public getResponse() {
+    return {
+      code: this.statusCode,
+      message: this.message,
+    };
+  }
 }
