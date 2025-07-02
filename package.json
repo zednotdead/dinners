@@ -1,0 +1,9 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "name": "dinners",
+    "workspaces": [
+        "frontend",
+        "auth",
+        "eslint-config-zed"
+    ]
+}

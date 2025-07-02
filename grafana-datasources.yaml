@@ -26,6 +26,12 @@ datasources:
   uid: tempo
   jsonData:
     httpMethod: GET
+    tracesToLogsV2:
+      datasourceUid: 'loki'
+      spanStartTimeShift: '-1h'
+      spanEndTimeShift: '1h'
+      filterByTraceID: true
+      filterBySpanID: true
     serviceMap:
       datasourceUid: prometheus
 - name: Loki

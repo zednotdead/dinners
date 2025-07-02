@@ -9,12 +9,18 @@ services:
     ports:
       - 5432:5432
 
+  valkey:
+    image: valkey/valkey:8.1.k
+    restart: on-failure
+    ports:
+      - 6379:6379
+
   alloy:
     image: grafana/alloy:v1.8.1
     ports:
-      - 12345:12345 # HTTP server for Alloy
-      - 4317:4317   # gRPC endpoint for OpenTelemetry
-      - 4318:4318   # HTTP endpoint for OpenTelemetry
+      - 12345:12345
+      - 4317:4317
+      - 4318:4318
     volumes:
       - ./config.alloy:/etc/alloy/config.alloy # Mount Alloy configuration
     command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy

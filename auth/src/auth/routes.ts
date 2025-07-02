@@ -10,15 +10,25 @@ import { users } from "./schema/user";
 import { credential } from "./schema/credential";
 import { DatabaseError, DatabaseErrorCode } from "../db/error";
 import { NotCreatedError, UserAlreadyExistsError } from "./errors/create";
-import { BaseError } from "../errors/base";
+import { BaseError, BaseErrorDTO } from "../errors/base";
 import { hash, verify } from "argon2"
 import { LoginDTO } from "./dto/login-dto";
 import { eq } from "drizzle-orm";
+import { JWTPayloadDTO } from "./dto/jwt-payload-dto";
+import { valkey } from "../cache";
+import { BaseMessageDTO } from "./dto/base-message-dto";
+import { InvalidPasswordError, UserHasNoPasswordError, UserNotFoundError } from "./errors/login";
+import { LoginResponseDTO } from "./dto/login-response-dto";
 
 export const routes: FastifyPluginAsyncZod = async (fastify) => {
     fastify.post("/", {
         schema: {
             body: CreateUserDTO,
+            response: {
+                200: UserDataDTO,
+                500: BaseErrorDTO,
+                409: BaseErrorDTO,
+            }
         }
     }, async (req) => {
         const { username, email, password } = req.body
@@ -60,9 +70,14 @@ export const routes: FastifyPluginAsyncZod = async (fastify) => {
 
     fastify.post("/login", {
         schema: {
-            body: LoginDTO
+            body: LoginDTO,
+            response: {
+                200: LoginResponseDTO,
+                401: BaseErrorDTO,
+                403: BaseErrorDTO,
+            }
         }
-    }, async (req) => {
+    }, async (req, res) => {
         const { email, password } = req.body
 
         const possibleUsers = await db
@@ -75,20 +90,54 @@ export const routes: FastifyPluginAsyncZod = async (fastify) => {
         const possibleUser = possibleUsers.at(0)
 
         if (!possibleUser)
-            throw new Error("Could not found user with email ${email}")
+            throw new UserNotFoundError(req.body)
 
         const hashedPassword = possibleUser.credentials?.password_hash
 
-        if (!hashedPassword) 
-            throw new Error("User does not have a password set")
+        if (!hashedPassword)
+            throw new UserHasNoPasswordError(req.body)
 
         const doesHashMatch = await verify(hashedPassword, password)
 
-        if (!doesHashMatch) 
-            throw new Error("User's password does not match")
+        if (!doesHashMatch)
+            throw new InvalidPasswordError()
 
-        return UserDataDTO.parse(possibleUser.users)
+        const user = UserDataDTO.parse(possibleUser.users)
+        const payload = JWTPayloadDTO.parse(user)
+
+        const jwt = await res.jwtSign(payload, { sign: { expiresIn: "2 days" } })
+
+        return {
+            access_token: jwt
+        }
     })
+
+    fastify.get("/", { onRequest: [fastify.authenticate] }, async (req) => {
+        const payload = req.user
+        const userPossible = await db.select().from(users).where(eq(users.id, payload.id)).execute()
+        const user = UserDataDTO.parse(userPossible[0])
+
+        return user
+    })
+
+    fastify.post(
+        "/logout",
+        {
+            onRequest: [fastify.authenticate],
+            schema: {
+                response: {
+                    200: BaseMessageDTO,
+                    401: BaseErrorDTO,
+                    403: BaseErrorDTO,
+                },
+            },
+        },
+        async (req) => {
+            if (!req.jwt) { throw new BaseError(401, "Missing JWT, somehow") }
+            await valkey.sadd('banned-jwt', [req.jwt])
+
+            return { message: "logged out" }
+        })
 
     fastify.route({
         method: "PUT",
@@ -105,14 +154,6 @@ export const routes: FastifyPluginAsyncZod = async (fastify) => {
         }
     })
 
-
-    fastify.setErrorHandler(function (error, _request, reply) {
-        if (error instanceof BaseError) {
-            reply.status(error.statusCode).send(error.getResponse())
-        } else {
-            reply.send(error)
-        }
-    })
 }
 
 const getUserFromMultipart = (fields: unknown = {}) => {

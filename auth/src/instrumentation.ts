@@ -5,7 +5,6 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 import { CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator } from "@opentelemetry/core";
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
-// import { SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
@@ -19,7 +18,6 @@ export const sdk = new NodeSDK({
     }),
     spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter()),
     logRecordProcessors: [
-        // new SimpleLogRecordProcessor(new OTLPLogExporter())
         new BatchLogRecordProcessor(new OTLPLogExporter())
     ],
     instrumentations: [
@@ -30,7 +28,7 @@ export const sdk = new NodeSDK({
                 spanId: 'span_id',
                 traceId: 'trace_id',
                 traceFlags: 'trace_flags'
-            }
+            },
         })
     ],
     textMapPropagator: new CompositePropagator({
