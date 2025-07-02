@@ -5,5 +5,11 @@
         "frontend",
         "auth",
         "eslint-config-zed"
-    ]
+    ],
+    "dependencies": {
+        "mprocs": "^0.7.3"
+    },
+    "scripts": {
+        "dev": "mprocs"
+    }
 }

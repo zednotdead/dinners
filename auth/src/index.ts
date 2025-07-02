@@ -14,6 +14,14 @@ export const app = fastify({
   logger: {
     level: 'trace',
     redact: ['req.headers.authorization'],
+    transport: {
+      targets: [
+        {
+          target: process.env.NODE_ENV === 'dev' ? 'pino-pretty' : 'pino/file',
+          options: { destination: 1 },
+        },
+      ],
+    },
     serializers: {
       req(request) {
         return {

@@ -2,3 +2,6 @@ procs:
   auth:
     shell: bun run dev
     cwd: auth
+  frontend:
+    shell: bun run dev
+    cwd: frontend

@@ -3,6 +3,9 @@
   "workspaces": {
     "": {
       "name": "dinners",
+      "dependencies": {
+        "mprocs": "^0.7.3",
+      },
     },
     "auth": {
       "name": "auth",
@@ -1118,6 +1121,8 @@
     "mnemonist": ["mnemonist@0.40.3", "", { "dependencies": { "obliterator": "^2.0.4" } }, "sha512-Vjyr90sJ23CKKH/qPAgUKicw/v6pRoamxIEDFOF8uSgFME7DqPRpHgRTejWVjkdGg5dXj0/NyxZHZ9bcjH+2uQ=="],
 
     "module-details-from-path": ["module-details-from-path@1.0.4", "", {}, "sha512-EGWKgxALGMgzvxYF1UyGTy0HXX/2vHLkw6+NvDKW2jypWbHpjQuj4UMcqQWXHERJhVGKikolT06G3bcKe4fi7w=="],
+
+    "mprocs": ["mprocs@0.7.3", "", { "bin": { "mprocs": "cli.js" } }, "sha512-I1Ptja/UnNVVSV5QEnBdiiwW70HMWJlmnMq6nvw4J7fwZ3s8UZGuf/FG+FTAUr6CLfat8kriHj+mWLx7xsLKSw=="],
 
     "ms": ["ms@2.1.3", "", {}, "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA=="],
 
