@@ -203,7 +203,7 @@ export const routes: FastifyPluginAsyncZod = async (fastify) => {
         updateObj.avatar = userAvatar.name;
       }
 
-      if (Object.keys({ ...updateObj, ...userUpdate }).length > 0) {
+      if (Object.keys(updateObj).length > 0) {
         const updatedUser = await db
           .update(users)
           .set(updateObj)

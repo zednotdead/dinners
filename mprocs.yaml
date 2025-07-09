@@ -6,4 +6,4 @@ procs:
     shell: bun run dev
     cwd: frontend
   minio:
-    shell: docker compose logs -f minio
+    shell: podman compose logs -f minio
