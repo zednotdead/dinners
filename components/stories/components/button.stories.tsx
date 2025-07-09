@@ -45,3 +45,21 @@ export const Outline: Story = {
     variant: "outline"
   },
 };
+
+export const Destructive: Story = {
+  args: {
+    variant: "destructive"
+  },
+};
+
+export const Ghost: Story = {
+  args: {
+    variant: "ghost"
+  },
+};
+
+export const Link: Story = {
+  args: {
+    variant: "link"
+  },
+};
