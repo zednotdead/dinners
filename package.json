@@ -4,7 +4,8 @@
     "workspaces": [
         "frontend",
         "auth",
-        "eslint-config-zed"
+        "eslint-config-zed",
+        "components"
     ],
     "dependencies": {
         "mprocs": "^0.7.3"
