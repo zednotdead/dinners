@@ -21,6 +21,10 @@ export default tseslint.config(
   {
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'off',
+      '@stylistic/jsx-one-expression-per-line': 'off',
     },
+  },
+  {
+    ignores: ['dist/'],
   },
 );

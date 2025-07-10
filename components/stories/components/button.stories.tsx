@@ -7,15 +7,15 @@ import { Heart } from 'lucide-react';
 const meta = {
   component: Button,
   args: {
-    onClick: fn(),
-    children: "Button",
-    disabled: false,
-    "aria-invalid": false,
+    'onClick': fn(),
+    'children': 'Button',
+    'disabled': false,
+    'aria-invalid': false,
   },
   argTypes: {
     variant: {
       control: 'select',
-      options: ["default", "outlined", "secondary"],
+      options: ['default', 'outlined', 'secondary'],
     },
   },
 } satisfies Meta<typeof Button>;
@@ -30,36 +30,40 @@ export const Primary: Story = {
 
 export const PrimaryWithIcon: Story = {
   args: {
-    children: <><Heart /> Love</>
+    children: (
+      <>
+        <Heart /> Love
+      </>
+    ),
   },
 };
 
 export const Secondary: Story = {
   args: {
-    variant: "secondary"
+    variant: 'secondary',
   },
 };
 
 export const Outline: Story = {
   args: {
-    variant: "outline"
+    variant: 'outline',
   },
 };
 
 export const Destructive: Story = {
   args: {
-    variant: "destructive"
+    variant: 'destructive',
   },
 };
 
 export const Ghost: Story = {
   args: {
-    variant: "ghost"
+    variant: 'ghost',
   },
 };
 
 export const Link: Story = {
   args: {
-    variant: "link"
+    variant: 'link',
   },
 };

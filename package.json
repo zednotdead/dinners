@@ -11,6 +11,8 @@
         "mprocs": "^0.7.3"
     },
     "scripts": {
-        "dev": "mprocs"
+        "dev": "mprocs",
+        "lint": "bun run --filter='*' lint",
+        "lint:fix": "bun run --filter='*' lint"
     }
 }

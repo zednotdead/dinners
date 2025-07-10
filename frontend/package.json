@@ -10,10 +10,11 @@
     "lint:fix": "next lint --fix"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "@dinners/components": "workspace:*",
+    "lucide-react": "^0.525.0",
     "next": "15.3.4",
-    "@dinners/components": "workspace:*"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "typescript": "^5",
@@ -24,6 +25,7 @@
     "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
-    "@eslint/eslintrc": "^3"
+    "@eslint/eslintrc": "^3",
+    "eslint-config-zed": "workspace:*"
   }
 }

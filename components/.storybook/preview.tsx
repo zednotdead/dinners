@@ -1,11 +1,11 @@
 import React from 'react';
-import type { Preview } from '@storybook/react-vite'
-import '@/index.css'
+import type { Preview } from '@storybook/react-vite';
+import '@/index.css';
 
 const preview: Preview = {
   parameters: {
     controls: {
-      exclude: ["asChild"],
+      exclude: ['asChild'],
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i,
@@ -31,14 +31,14 @@ const preview: Preview = {
   },
   decorators: [
     (Story, context) => {
-      if (context.globals.theme === "dark") {
-        document.body.classList.add("dark")
+      if (context.globals.theme === 'dark') {
+        document.body.classList.add('dark');
       } else {
-        document.body.classList.remove("dark")
+        document.body.classList.remove('dark');
       }
-        return <Story />
+      return <Story />;
     },
-  ]
+  ],
 };
 
 export default preview;
