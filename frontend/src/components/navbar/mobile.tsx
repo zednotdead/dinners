@@ -6,7 +6,7 @@ import { Home } from 'lucide-react';
 
 export const MobileNavbar: FC = () => {
   return (
-    <div className={cn('w-full py-4 border absolute bottom-0 md:hidden flex')}>
+    <div className={cn('w-full absolute bottom-0 hidden max-lg:flex')}>
       <button>
         <Home />
       </button>
