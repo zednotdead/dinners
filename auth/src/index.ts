@@ -1,12 +1,14 @@
 import fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { routes } from './auth/routes';
-import fastifyMultipart from '@fastify/multipart';
+import fastifyMultipart, { type MultipartFile, type MultipartValue } from '@fastify/multipart';
 import { fastifyOtelInstrumentation, sdk } from './instrumentation';
 import gracefulShutdown from 'http-graceful-shutdown';
 import { pool } from './db';
 import authenticatePlugin from './auth/middleware/authenticate';
 import { BaseError } from './errors/base';
+import { s3 } from './s3';
+import { uuidv4 } from 'zod/v4';
 
 sdk.start();
 
@@ -38,7 +40,32 @@ export const app = fastify({
 });
 
 await app.register(fastifyOtelInstrumentation.plugin());
-await app.register(fastifyMultipart, { attachFieldsToBody: true });
+
+await app.register(fastifyMultipart, {
+  attachFieldsToBody: 'keyValues',
+  async onFile(part) {
+    this.log.info('Uploading temporary file', { filename: part.filename });
+    const tempFile = s3.file(`temp/${uuidv4()}-${part.filename}`, { type: part.mimetype });
+    const writer = tempFile.writer({
+      retry: 3,
+      queueSize: 10,
+      partSize: 5 * 1024 * 1024,
+    });
+
+    for await (const chunk of part.file) {
+      writer.write(chunk);
+    }
+
+    await writer.end();
+
+    if (!tempFile.name) {
+      throw new Error('Could not upload file');
+    }
+
+    (part as unknown as MultipartValue).value = tempFile.name;
+  },
+});
+
 await app.register(authenticatePlugin);
 
 app.setValidatorCompiler(validatorCompiler);

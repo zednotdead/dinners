@@ -1,11 +1,7 @@
 import { z } from 'zod/v4';
-import { MultipartFile } from './multipart-file';
 
 export const UpdateUserDTO = z.object({
-  avatar: z.union([
-    MultipartFile,
-    z.literal(''),
-  ]).optional().nullable(),
+  avatar: z.string().optional().nullable(),
   username: z.string().optional(),
 });
 

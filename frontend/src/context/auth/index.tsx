@@ -3,8 +3,9 @@
 import { createContext, FC, PropsWithChildren, useState } from 'react';
 import { logIn as logInAction } from './action/login';
 import { logOut as logOutAction } from './action/logout';
+import { redirect } from 'next/navigation';
 
-interface User {
+export interface User {
   id: string;
   username: string;
   avatar?: string;
@@ -33,7 +34,12 @@ export const AuthContextProvider: FC<PropsWithChildren<AuthContextProviderProps>
 
   function logOut() {
     logOutAction()
-      .then((didLogOut) => { if (didLogOut) setUser(undefined); });
+      .then((didLogOut) => {
+        if (didLogOut) {
+          setUser(undefined);
+          redirect('/');
+        };
+      });
   }
 
   return (

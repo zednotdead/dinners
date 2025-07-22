@@ -187,20 +187,29 @@ export const routes: FastifyPluginAsyncZod = async (fastify) => {
         }
         updateObj.avatar = null;
       } else if (userUpdate.avatar) {
-        req.log.debug('Writing a new avatar to S3');
-        const userAvatar = s3.file(`avatar/${user.id}`, { type: userUpdate.avatar.metadata.mimetype });
-        const writer = userAvatar.writer({
+        const temp = s3.file(userUpdate.avatar);
+        const avatar = s3.file(`avatar/${user.id}`, { type: temp.type });
+        const writer = avatar.writer({
+          // Automatically retry on network errors up to 3 times
           retry: 3,
+
+          // Queue up to 10 requests at a time
           queueSize: 10,
+
+          // Upload in 5 MB chunks
           partSize: 5 * 1024 * 1024,
         });
 
-        for await (const chunk of userUpdate.avatar.file) {
+        for await (const chunk of temp.stream()) {
           writer.write(chunk);
+          await writer.flush();
         }
 
         await writer.end();
-        updateObj.avatar = userAvatar.name;
+
+        await temp.delete();
+
+        updateObj.avatar = avatar.name;
       }
 
       if (Object.keys(updateObj).length > 0) {
@@ -220,27 +229,5 @@ export const routes: FastifyPluginAsyncZod = async (fastify) => {
 };
 
 const getUserFromMultipart = (fields: unknown = {}) => {
-  const user: Record<string, string | MultipartFileType> = {};
-  const updateUserKeys = Object.keys(fields as MultipartFields);
-
-  updateUserKeys.forEach((k) => {
-    const f = (fields as Record<string, MultipartFields>)[k];
-    const fieldValue: Multipart = Array.isArray(f) ? f[0] : f;
-
-    if (fieldValue) {
-      if (fieldValue.type === 'field') {
-        user[k] = fieldValue.value as string;
-      } else {
-        user[k] = {
-          file: fieldValue.file,
-          metadata: {
-            filename: fieldValue.filename,
-            mimetype: fieldValue.mimetype,
-          },
-        };
-      }
-    }
-  });
-
-  return UpdateUserDTO.parse(user);
+  return UpdateUserDTO.parse(fields);
 };

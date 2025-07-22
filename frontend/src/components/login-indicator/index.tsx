@@ -1,25 +1,36 @@
 import { AuthContext } from '@/context/auth';
-import { cn, Popover, PopoverContent, PopoverTrigger } from '@dinners/components';
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from '@dinners/components';
 import { ComponentProps, FC, useContext } from 'react';
+import { UserAvatar } from './user-avatar';
+import Link from 'next/link';
 
 export const LoginIndicator: FC<ComponentProps<'button'>> = ({ className, ...props }) => {
   const { user, logIn, logOut } = useContext(AuthContext);
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className={cn('ms-auto flex flex-row items-center-safe justify-center-safe', className)} {...props}>
-          {user ? user.username : 'Log in'}
-        </button>
+        <Button variant="secondary" className={cn('text-md ms-auto h-fit w-fit p-2 rounded-full', className)} {...props}>
+          <UserAvatar fallbackClassName="bg-transparent" user={user} />
+        </Button>
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent alignOffset={20} className={cn('flex flex-col items-stretch space-y-2 m-2')}>
         {user
           ? (
-              <pre onClick={logOut}>
-                {JSON.stringify(user, null, 2)}
-              </pre>
+              <>
+                <Button asChild variant="ghost" className={cn('h-fit flex justify-start space-x-2')}>
+                  <Link href={`/user/${user.id}`}>
+                    <UserAvatar user={user} />
+                    <div className="text-md font-semibold">{user.username}</div>
+                  </Link>
+                </Button>
+                <Button onClick={logOut}>Log out</Button>
+              </>
             )
           : (
-              <button onClick={logIn}>Log in</button>
+              <>
+                <Button onClick={logIn}>Log in</Button>
+                <Button variant="secondary">Register</Button>
+              </>
             )}
       </PopoverContent>
     </Popover>
