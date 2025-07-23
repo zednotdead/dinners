@@ -17,6 +17,7 @@ export const fastifyOtelInstrumentation = new FastifyOtelInstrumentation();
 export const sdk = new NodeSDK({
   resource: resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'dinners/auth',
+    'service.namespace': 'dinners/auth',
   }),
   metricReader: new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter(),

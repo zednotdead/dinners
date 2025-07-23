@@ -7,6 +7,27 @@ prometheus.scrape "default" {
     forward_to = [prometheus.remote_write.default.receiver]
 }
 
+faro.receiver "default" {
+  server {
+    listen_address           = "0.0.0.0"
+    listen_port              = 12347
+    cors_allowed_origins     = ["http://localhost:3000"]
+    api_key                  = "secret"
+  }
+
+  sourcemaps {
+    location {
+      path                 = "/var/app/build"
+      minified_path_prefix = "http://localhost:3000/_next"
+    }
+  }
+
+  output {
+    logs   = [loki.process.logs_process_client.receiver]
+    traces = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
 otelcol.receiver.otlp "default" {
   grpc {}
   http {}
@@ -59,11 +80,26 @@ prometheus.remote_write "default" {
 
 logging {
   level = "debug"
-  write_to = [loki.write.default.receiver]
+  write_to = [loki.write.logs_write_client.receiver]
 }
 
-loki.write "default" {
-    endpoint {
-        url = "http://loki:3100/loki/api/v1/push"
-    }
+loki.process "logs_process_client" {
+  forward_to = [loki.write.logs_write_client.receiver]
+
+  stage.logfmt {
+    mapping = { "kind" = "", "app_name" = "" }
+  }
+
+  stage.labels {
+    values = { "kind" = "kind", "service_name" = "app_name", "app" = "app_name" }
+  }
+}
+
+loki.write "logs_write_client" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+
+	external_labels = {
+  }
 }

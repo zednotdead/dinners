@@ -4,6 +4,7 @@ import './globals.css';
 import { Navbar } from '@/components/navbar';
 import { AuthContextProvider } from '@/context/auth';
 import { getUser } from '@/context/auth/action/get';
+import FrontendObservability from '@/components/instrumentation';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,6 +31,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <FrontendObservability />
         <AuthContextProvider initialUser={await getUser()}>
           <Navbar />
           {children}
