@@ -1,4 +1,5 @@
 {
+  "$schema": "https://www.schemastore.org/tsconfig.json",
   "compilerOptions": {
     "target": "ES2017",
     "lib": [
@@ -26,7 +27,8 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "allowImportingTsExtensions": true
   },
   "include": [
     "next-env.d.ts",

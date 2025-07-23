@@ -1,7 +1,7 @@
 import fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { routes } from './auth/routes';
-import fastifyMultipart, { type MultipartFile, type MultipartValue } from '@fastify/multipart';
+import fastifyMultipart, { type MultipartValue } from '@fastify/multipart';
 import { fastifyOtelInstrumentation, sdk } from './instrumentation';
 import gracefulShutdown from 'http-graceful-shutdown';
 import { pool } from './db';

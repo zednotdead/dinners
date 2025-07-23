@@ -13,7 +13,7 @@ export const LoginIndicator: FC<ComponentProps<'button'>> = ({ className, ...pro
           <UserAvatar fallbackClassName="bg-transparent" user={user} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent alignOffset={20} className={cn('flex flex-col items-stretch space-y-2 m-2')}>
+      <PopoverContent className={cn('flex flex-col items-stretch space-y-2 m-2')}>
         {user
           ? (
               <>
