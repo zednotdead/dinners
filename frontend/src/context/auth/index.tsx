@@ -6,6 +6,7 @@ import { logOut as logOutAction } from './action/logout';
 import { redirect } from 'next/navigation';
 import logger from '@/lib/logger';
 import { faro } from '@grafana/faro-web-sdk';
+import { IncorrectPasswordError, UnknownLoginError, UnknownUserError } from '@/lib/api/login/errors';
 
 export interface User {
   id: string;
@@ -15,13 +16,13 @@ export interface User {
 
 interface AuthContextValue {
   user?: User;
-  logIn: () => void;
-  logOut: () => void;
+  logIn: (email: string, password: string) => Promise<void>;
+  logOut: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue>({
-  logIn: () => { /* noop */ },
-  logOut: () => { /* noop */ },
+  logIn: async () => { /* noop */ },
+  logOut: async () => { /* noop */ },
 });
 
 interface AuthContextProviderProps { initialUser?: User }
@@ -29,28 +30,39 @@ interface AuthContextProviderProps { initialUser?: User }
 export const AuthContextProvider: FC<PropsWithChildren<AuthContextProviderProps>> = ({ initialUser, children }) => {
   const [user, setUser] = useState<User | undefined>(initialUser);
 
-  function logIn() {
+  function logIn(email: string, password: string) {
     const { trace, context } = faro.api.getOTEL()!;
 
     const tracer = trace.getTracer('default');
     const span = tracer.startSpan('click');
 
-    context.with(trace.setSpan(context.active(), span), () => {
+    return context.with(trace.setSpan(context.active(), span), async () => {
       logger.info('Logging user in');
-      logInAction()
-        .then((user) => setUser(user));
-      span.end();
+
+      const res = await logInAction(email, password);
+
+      if (res.error && !res.user) {
+        switch (res.code) {
+          case IncorrectPasswordError.code:
+            throw new IncorrectPasswordError();
+          case UnknownUserError.code:
+            throw new UnknownUserError();
+          default:
+            throw new UnknownLoginError();
+        }
+      } else {
+        setUser(res.user);
+      }
+      return;
     });
   }
 
-  function logOut() {
-    logOutAction()
-      .then((didLogOut) => {
-        if (didLogOut) {
-          setUser(undefined);
-          redirect('/');
-        };
-      });
+  async function logOut() {
+    const didLogOut = await logOutAction();
+    if (didLogOut) {
+      setUser(undefined);
+      redirect('/');
+    };
   }
 
   return (

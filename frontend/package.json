@@ -13,6 +13,7 @@
     "@dinners/components": "workspace:*",
     "@grafana/faro-web-sdk": "^1.19.0",
     "@grafana/faro-web-tracing": "^1.19.0",
+    "@hookform/resolvers": "^5.2.1",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/api-logs": "^0.203.0",
     "@opentelemetry/auto-instrumentations-node": "^0.62.0",
@@ -33,7 +34,10 @@
     "pino-pretty": "^13.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.3.1"
+    "react-hook-form": "^7.61.1",
+    "tailwind-merge": "^3.3.1",
+    "ts-custom-error": "^3.3.1",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "typescript": "^5",

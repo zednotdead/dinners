@@ -1,4 +1,3 @@
-import { LoginForm } from '@/components/login-form';
 import { getUser } from '@/context/auth/action/get';
 import { cn } from '@/utils/cn';
 import {
@@ -14,7 +13,7 @@ import { Link } from '@dinners/components/link';
 import NextLink from 'next/link';
 import { redirect } from 'next/navigation';
 
-export default async function LoginPage() {
+export default async function RegisterPage() {
   if (await getUser()) {
     return redirect('/');
   }
@@ -26,16 +25,12 @@ export default async function LoginPage() {
           <CardTitle>Log in</CardTitle>
         </CardHeader>
         <CardContent>
-          <LoginForm successfulLogin={async function () {
-            'use server';
-            redirect('/');
-          }}
-          />
+          <p>todo</p>
         </CardContent>
         <CardFooter className="flex items-center justify-center">
           <Link asChild>
-            <NextLink href="/auth/register">
-              I don&apos;t have an account yet
+            <NextLink href="/auth/login">
+              I already have an account
             </NextLink>
           </Link>
         </CardFooter>
