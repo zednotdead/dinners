@@ -7,3 +7,4 @@ procs:
     cwd: frontend
   minio:
     shell: docker compose logs -f minio
+    stop: SIGKILL
