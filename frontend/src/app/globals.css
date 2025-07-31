@@ -1,3 +1,2 @@
 @import "tailwindcss";
-@import "@dinners/components/dist/index.css";
-@import "@dinners/components/dist/theme.css";
+@import "@dinners/components";

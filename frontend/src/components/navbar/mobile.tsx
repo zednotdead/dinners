@@ -1,7 +1,5 @@
-'use client';
-
 import { FC } from 'react';
-import { cn } from '@dinners/components';
+import { cn } from '@/utils/cn';
 import { Home } from 'lucide-react';
 
 export const MobileNavbar: FC = () => {

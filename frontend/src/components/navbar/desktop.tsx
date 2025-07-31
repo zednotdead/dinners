@@ -1,5 +1,3 @@
-'use client';
-
 import { FC } from 'react';
 import {
   NavigationMenu,
@@ -9,10 +7,10 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-  cn,
-} from '@dinners/components';
+} from '@dinners/components/navigation-menu';
 import Link from 'next/link';
 import { LoginIndicator } from '../login-indicator';
+import { cn } from '@/utils/cn';
 
 export const DesktopNavbar: FC = () => {
   return (
@@ -21,7 +19,7 @@ export const DesktopNavbar: FC = () => {
         <NavigationMenu viewport={false}>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={cn(navigationMenuTriggerStyle())}>
+              <NavigationMenuLink asChild className={cn(navigationMenuTriggerStyle)}>
                 <Link href="/">Home</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>

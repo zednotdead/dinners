@@ -1,11 +1,16 @@
+'use client';
+
 import { AuthContext } from '@/context/auth';
-import { Button, cn, Popover, PopoverContent, PopoverTrigger } from '@dinners/components';
-import { ComponentProps, FC, useContext } from 'react';
+import { ComponentProps, FC, use } from 'react';
 import { UserAvatar } from './user-avatar';
 import Link from 'next/link';
+import { cn } from '@/utils/cn';
+import { Popover, PopoverTrigger, PopoverContent } from '@dinners/components/popover';
+import { Button } from '@dinners/components/button';
 
 export const LoginIndicator: FC<ComponentProps<'button'>> = ({ className, ...props }) => {
-  const { user, logIn, logOut } = useContext(AuthContext);
+  const { user, logOut } = use(AuthContext);
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -28,8 +33,12 @@ export const LoginIndicator: FC<ComponentProps<'button'>> = ({ className, ...pro
             )
           : (
               <>
-                <Button onClick={logIn}>Log in</Button>
-                <Button variant="secondary">Register</Button>
+                <Button asChild>
+                  <Link href="/auth/login">Log in</Link>
+                </Button>
+                <Button variant="secondary">
+                  <Link href="/auth/register">Register</Link>
+                </Button>
               </>
             )}
       </PopoverContent>

@@ -1,5 +1,6 @@
 import { User as UserType } from '@/context/auth';
-import { Avatar, AvatarFallback, AvatarImage, cn } from '@dinners/components';
+import { cn } from '@/utils/cn';
+import { Avatar, AvatarFallback, AvatarImage } from '@dinners/components/avatar';
 import { User } from 'lucide-react';
 import { FC } from 'react';
 
