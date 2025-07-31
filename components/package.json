@@ -15,30 +15,10 @@
       "require": "./dist/index.cjs.js",
       "default": "./dist/index.css"
     },
-    "./card": {
-      "types": "./dist/card.d.ts",
-      "import": "./dist/card.es.js",
-      "require": "./dist/card.cjs.js"
-    },
-    "./avatar": {
-      "types": "./dist/avatar.d.ts",
-      "import": "./dist/avatar.es.js",
-      "require": "./dist/avatar.cjs.js"
-    },
-    "./navigation-menu": {
-      "types": "./dist/navigation-menu.d.ts",
-      "import": "./dist/navigation-menu.es.js",
-      "require": "./dist/navigation-menu.cjs.js"
-    },
-    "./button": {
-      "types": "./dist/button.d.ts",
-      "import": "./dist/button.es.js",
-      "require": "./dist/button.cjs.js"
-    },
-    "./popover": {
-      "types": "./dist/popover.d.ts",
-      "import": "./dist/popover.es.js",
-      "require": "./dist/popover.cjs.js"
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.es.js",
+      "require": "./dist/*.cjs.js"
     },
     "./*.css": "./dist/*.css"
   },
@@ -58,6 +38,7 @@
     "storybook": "^9.0.16",
     "tw-animate-css": "^1.3.5",
     "unplugin-dts": "^1.0.0-beta.6",
+    "vite": "^7.0.6",
     "vite-plugin-lib-inject-css": "^2.2.2",
     "vitest": "^3.2.4"
   },
@@ -73,7 +54,9 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-navigation-menu": "^1.2.13",
     "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.3",
@@ -83,9 +66,11 @@
     "clsx": "^2.1.1",
     "fast-glob": "^3.3.3",
     "lucide-react": "^0.525.0",
+    "react-hook-form": "^7.61.1",
     "rollup-preserve-directives": "^1.1.3",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
-    "typescript": "^5"
+    "typescript": "^5",
+    "zod": "^4.0.14"
   }
 }

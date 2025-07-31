@@ -7,21 +7,20 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { peerDependencies } from './package.json';
 import preserveDirectives from 'rollup-preserve-directives';
+import fg from 'fast-glob';
+
+const entry = await fg('src/components/ui/**/*.tsx');
 
 // https://vite.dev/config/
 export default defineConfig({
   build: {
     lib: {
-      entry: {
-        'avatar': resolve(__dirname, 'src/components/ui/avatar.tsx'),
-        'card': resolve(__dirname, 'src/components/ui/card.tsx'),
-        'button': resolve(__dirname, 'src/components/ui/button.tsx'),
-        'navigation-menu': resolve(__dirname, 'src/components/ui/navigation-menu.tsx'),
-        'popover': resolve(__dirname, 'src/components/ui/popover.tsx'),
-        'index': resolve(__dirname, 'src/index.ts'),
-      },
+      entry: [
+        ...entry,
+        resolve(__dirname, 'src/index.ts'),
+      ],
       name: '@dinners/components',
-      formats: ['es', 'cjs'],
+      formats: ['es'],
       fileName: (format, entryname) => `${entryname}.${format}.js`,
     },
     rollupOptions: {
