@@ -1,4 +1,3 @@
-import type { Multipart, MultipartFields } from '@fastify/multipart';
 import { UpdateUserDTO } from './dto/update-user-dto';
 import { CreateUserDTO } from './dto/create-user-dto';
 import { UserDataDTO, type UserDataDTOType } from './dto/user-data-dto';
@@ -18,7 +17,6 @@ import { BaseMessageDTO } from './dto/base-message-dto';
 import { InvalidPasswordError, UserHasNoPasswordError, UserNotFoundError } from './errors/login';
 import { LoginResponseDTO } from './dto/login-response-dto';
 import { s3 } from '../s3';
-import { type MultipartFileType } from './dto/multipart-file';
 
 export const routes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.post('/', {
