@@ -23,6 +23,27 @@ definitions:
       username:
         type: string
     type: object
+  http.LoginRequest:
+    properties:
+      password:
+        example: securepassword
+        type: string
+      username:
+        example: username
+        type: string
+    type: object
+  http.RegistrationRequest:
+    properties:
+      email:
+        example: username@example.com
+        type: string
+      password:
+        example: securepassword
+        type: string
+      username:
+        example: username
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -39,11 +60,40 @@ info:
   title: Dinners Auth
   version: 0.0.1
 paths:
+  /:
+    post:
+      consumes:
+      - application/json
+      description: Register a new account
+      parameters:
+      - description: Registration request body
+        in: body
+        name: registration_request
+        required: true
+        schema:
+          $ref: '#/definitions/http.RegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_zednotdead_dinners_auth_internal_server_domain_models.User'
+      summary: Register
+      tags:
+      - accounts
   /login:
-    get:
+    post:
       consumes:
       - application/json
       description: Log in to the account
+      parameters:
+      - description: Login request object
+        in: body
+        name: login_request
+        required: true
+        schema:
+          $ref: '#/definitions/http.LoginRequest'
       produces:
       - application/json
       responses:

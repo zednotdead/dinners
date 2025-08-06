@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-#MISE description="Generate necessary files"
-
-cd auth-new && make gen-docs
-
-# vim: ft=bash

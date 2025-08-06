@@ -23,8 +23,42 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/": {
+            "post": {
+                "description": "Register a new account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Register",
+                "parameters": [
+                    {
+                        "description": "Registration request body",
+                        "name": "registration_request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.RegistrationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_server_domain_models.User"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
-            "get": {
+            "post": {
                 "description": "Log in to the account",
                 "consumes": [
                     "application/json"
@@ -36,6 +70,17 @@ const docTemplate = `{
                     "accounts"
                 ],
                 "summary": "Log in",
+                "parameters": [
+                    {
+                        "description": "Login request object",
+                        "name": "login_request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.LoginRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -82,6 +127,36 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "http.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "securepassword"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "username"
+                }
+            }
+        },
+        "http.RegistrationRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "username@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "securepassword"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "username"
                 }
             }
         }

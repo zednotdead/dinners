@@ -1,32 +1,37 @@
 package http
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
-	"github.com/zednotdead/dinners/auth/internal/port"
 	"github.com/zednotdead/dinners/auth/internal/server/domain/models"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/zednotdead/dinners/auth/internal/server/service"
 )
 
 type UserHandler struct {
-	svc port.UserService
+	svc *service.UserService
 }
 
-func NewUserHandler(svc port.UserService) *UserHandler {
+func NewUserHandler(svc *service.UserService) *UserHandler {
 	return &UserHandler{
 		svc: svc,
 	}
 }
 
 type RegistrationRequest struct {
-	Username string
-	Email    string
-	Password string
+	Username string `json:"username" example:"username"`
+	Email    string `json:"email" example:"username@example.com"`
+	Password string `json:"password" example:"securepassword"`
 }
 
+// Register godoc
+//
+//	@Summary		Register
+//	@Description	Register a new account
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			registration_request	body		RegistrationRequest	true	"Registration request body"
+//	@Success		201						{object}	models.User
+//	@Router			/ [post]
 func (uh *UserHandler) Register(ctx *gin.Context) {
 	registration := new(RegistrationRequest)
 
@@ -51,26 +56,21 @@ func (uh *UserHandler) Register(ctx *gin.Context) {
 }
 
 type LoginRequest struct {
-	Username string
-	Password string
+	Username string `json:"username" example:"username"`
+	Password string `json:"password" example:"securepassword"`
 }
 
-// ShowAccount godoc
+// Login godoc
 //
 //	@Summary		Log in
 //	@Description	Log in to the account
 //	@Tags			accounts
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	models.User
-//	@Router			/login [get]
+//	@Param			login_request	body		LoginRequest	true	"Login request object"
+//	@Success		200				{object}	models.User
+//	@Router			/login [post]
 func (uh *UserHandler) Login(ctx *gin.Context) {
-	tracex := trace.SpanFromContext(ctx)
-	b := otel.GetTextMapPropagator().Extract(ctx, propagation.HeaderCarrier(ctx.Request.Header))
-	tracet := trace.SpanFromContext(b)
-	fmt.Println("AAAAAA", ctx.Request.Header.Get("traceparent"))
-	fmt.Println("BBBBBB", tracet.SpanContext().SpanID())
-	fmt.Println("CCCCCC", tracex.SpanContext().SpanID())
 	login := new(LoginRequest)
 	if err := ctx.BindJSON(&login); err != nil {
 		ctx.Error(err)

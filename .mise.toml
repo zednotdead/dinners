@@ -3,11 +3,18 @@ _.file = '.env'
 
 [tools]
 air = "1.62.0"
-atlas = "v0.35.0"
+atlas = "0.36.0"
 make = "4.4.1"
-mc = "2025-05-21T01-59-54Z"
+mc = "2025-07-21T05-28-08Z"
 node = "22"
 pkl = "0.29.0"
-swag = "v1.16.6"
+swag = "1.16.6"
 "ubi:pamburus/hl" = "0.31.2"
 hk = "1.2.2"
+mprocs = "0.7.3"
+
+[tasks]
+check = "hk check"
+fix = "hk fix"
+dev = "mprocs"
+docker = "docker compose up -d"

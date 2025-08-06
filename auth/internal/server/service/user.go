@@ -2,19 +2,18 @@ package service
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/zednotdead/dinners/auth/internal/port"
+	"github.com/zednotdead/dinners/auth/internal/port/user/repository"
 	"github.com/zednotdead/dinners/auth/internal/server/domain/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
-	userRepo port.UserRepository
-	credRepo port.CredentialRepository
+	userRepo repository.UserRepository
+	credRepo repository.CredentialRepository
 }
 
-func NewUserService(userRepo port.UserRepository, credRepo port.CredentialRepository) *UserService {
+func NewUserService(userRepo repository.UserRepository, credRepo repository.CredentialRepository) *UserService {
 	return &UserService{
 		userRepo,
 		credRepo,
@@ -31,8 +30,6 @@ func (us *UserService) Register(ctx context.Context, user *models.User, password
 	if err != nil {
 		return nil, nil, err
 	}
-
-	fmt.Println(user.ID)
 
 	credential, err := us.credRepo.CreateCredential(ctx, &models.Credential{
 		UserID:       user.ID,

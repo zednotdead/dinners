@@ -1,7 +1,7 @@
 procs:
   auth:
     shell: make dev
-    cwd: auth-new
+    cwd: auth
   frontend:
     shell: bun run dev
     cwd: frontend

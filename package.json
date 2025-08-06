@@ -3,7 +3,6 @@
     "name": "dinners",
     "workspaces": [
         "frontend",
-        "auth",
         "eslint-config-zed",
         "components"
     ],

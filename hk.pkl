@@ -2,8 +2,6 @@ amends "package://github.com/jdx/hk/releases/download/v1.2.0/hk@1.2.0#/Config.pk
 import "package://github.com/jdx/hk/releases/download/v1.2.0/hk@1.2.0#/Builtins.pkl"
 
 local miscLinters = new Mapping<String, Step> {
-    ["json"] = Builtins.jq
-    ["yaml"] = Builtins.yamllint
     ["pkl"] {
         glob = "*.pkl"
         check = "pkl eval {{files}} >/dev/null"
@@ -11,13 +9,14 @@ local miscLinters = new Mapping<String, Step> {
 }
 
 local lint = new Mapping<String, Step> {
-    ["lint:frontend"] {
-        dir = "frontend"
-        shell = "bun run lint:fix"
+    ["auth"] {
+        dir = "auth"
+        fix = "make fmt"
     }
-    ["lint:auth-new"] {
-        dir = "auth-new"
-        shell = "make fmt"
+    ["frontend"] {
+        dir = "frontend"
+        check = "bun run lint"
+        fix = "bun run lint:fix"
     }
     ...miscLinters
 }
@@ -28,16 +27,14 @@ hooks {
         stash = "git"
         steps {
             ["generate"] {
-                shell = "mise run generate"
+                shell = "mise run gen-openapi"
             }
             ...lint
         }
     }
-    // instead of pre-commit, you can instead define pre-push hooks
     ["pre-push"] {
         steps = lint
     }
-    // "fix" and "check" are special steps for `hk fix` and `hk check` commands
     ["fix"] {
         fix = true
         steps = lint
@@ -46,3 +43,5 @@ hooks {
         steps = lint
     }
 }
+
+// vim: ft=pkl

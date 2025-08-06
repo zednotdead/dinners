@@ -2,9 +2,14 @@ run:
 	go run .
 dev:
 	air 
-fmt:
-	swag fmt
-	gofmt -s -w .
 
-gen-docs:
+fmt: fmt-docs fmt-go
+
+fmt-go:
+	gofmt -s -w -l .
+
+fmt-docs:
+	swag fmt
+
+gen-openapi:
 	swag init -g internal/server/NewServer.go

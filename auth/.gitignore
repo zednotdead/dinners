@@ -1,34 +1,31 @@
-# dependencies (bun install)
-node_modules
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
-# output
-out
-dist
-*.tgz
+# Test binary, built with `go test -c`
+*.test
 
-# code coverage
-coverage
-*.lcov
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
 
-# logs
-logs
-_.log
-report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+# Dependency directories (remove the comment below to include it)
+# vendor/
 
-# dotenv environment variable files
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
 
-# caches
-.eslintcache
-.cache
-*.tsbuildinfo
+# Editor/IDE
+# .idea/
+# .vscode/
 
-# IntelliJ based IDEs
-.idea
-
-# Finder (MacOS) folder config
-.DS_Store
+tmp/
