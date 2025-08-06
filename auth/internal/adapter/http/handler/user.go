@@ -1,21 +1,29 @@
-package http
+package handler
 
 import (
+	"errors"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/zednotdead/dinners/auth/internal/domain/models"
-	"github.com/zednotdead/dinners/auth/internal/server/service"
+	"github.com/zednotdead/dinners/auth/internal/service"
 )
 
 var validate = validator.New()
 
 type UserHandler struct {
 	svc *service.UserService
+	jwt *service.JwtService
 }
 
-func NewUserHandler(svc *service.UserService) *UserHandler {
+func NewUserHandler(svc *service.UserService, jwtsvc *service.JwtService) *UserHandler {
 	return &UserHandler{
 		svc: svc,
+		jwt: jwtsvc,
 	}
 }
 
@@ -69,6 +77,11 @@ type LoginRequest struct {
 	Password string `json:"password" example:"securepassword" validate:"required,min=5"`
 }
 
+type LoginResponse struct {
+	Token   string `json:"token"`
+	Expires string `json:"expires"`
+}
+
 // Login godoc
 //
 //	@Summary		Log in
@@ -102,5 +115,61 @@ func (uh *UserHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, u)
+	issuedAt := time.Now()
+	expiresAt := issuedAt.Add(time.Hour)
+
+	claims := jwt.RegisteredClaims{
+		Subject:   u.ID.String(),
+		IssuedAt:  jwt.NewNumericDate(issuedAt),
+		ExpiresAt: jwt.NewNumericDate(expiresAt),
+	}
+
+	token, err := uh.jwt.SignToken(claims)
+
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(200, LoginResponse{
+		Token:   token,
+		Expires: expiresAt.Format(time.RFC1123),
+	})
+}
+
+// Info godoc
+//
+//	@Summary		User info
+//	@Description	Get information about currently logged in account
+//	@Tags			accounts
+//	@Produce		json
+//	@Success		200	{object}	models.User
+//	@Router			/ [get]
+func (uh *UserHandler) Info(ctx *gin.Context) {
+	authHeader := strings.Split(ctx.Request.Header.Get("Authorization"), "Bearer ")
+	if len(authHeader) != 2 {
+		ctx.Error(errors.New("Malformed Authorization header"))
+		return
+	}
+	token := authHeader[1]
+
+	claims, err := uh.jwt.DecodeToken(token)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	id, err := uuid.Parse(claims.Subject)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	user, err := uh.svc.Info(ctx, id)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(200, user)
 }

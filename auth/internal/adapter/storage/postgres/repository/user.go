@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"github.com/zednotdead/dinners/auth/internal/adapter/storage/postgres/repository/models"
 	domain "github.com/zednotdead/dinners/auth/internal/domain/models"
@@ -45,6 +46,28 @@ func (repo *UserRepository) GetUserByUsername(ctx context.Context, username stri
 		WithContext(ctx).
 		Preload("Credentials").
 		Where("username = ?", username).
+		Take(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("User not found")
+		}
+		return nil, result.Error
+	}
+
+	outputUser := domain.User{}
+	copier.Copy(&outputUser, &user)
+
+	return &outputUser, nil
+}
+
+func (repo *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+	var user models.User
+
+	result := repo.DB.
+		WithContext(ctx).
+		Preload("Credentials").
+		Where("id = ?", id).
 		Take(&user)
 
 	if result.Error != nil {

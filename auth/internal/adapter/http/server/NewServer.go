@@ -9,9 +9,9 @@ import (
 	sloggin "github.com/samber/slog-gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	handler "github.com/zednotdead/dinners/auth/internal/adapter/handler/http"
+	"github.com/zednotdead/dinners/auth/internal/adapter/http/handler"
 	"github.com/zednotdead/dinners/auth/internal/adapter/storage/postgres/repository"
-	"github.com/zednotdead/dinners/auth/internal/server/service"
+	"github.com/zednotdead/dinners/auth/internal/service"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"gorm.io/driver/postgres"
@@ -85,16 +85,13 @@ func NewServer(ctx context.Context) *Server {
 	userRepo := repository.NewUserRepository(db)
 	credRepo := repository.NewCredentialRepository(db)
 	userService := service.NewUserService(userRepo, credRepo)
-	userHandler := handler.NewUserHandler(userService)
+	jwtService := service.NewJwtService("zażółć gęślą jaźń")
+	userHandler := handler.NewUserHandler(userService, jwtService)
 	app.Use(otelgin.Middleware("dinners/auth"))
 
 	user := app.Group("/")
 	user.
-		GET("/", func(ctx *gin.Context) {
-			ctx.JSON(200, gin.H{
-				"username": "",
-			})
-		}).
+		GET("/", userHandler.Info).
 		POST("/", userHandler.Register).
 		POST("/login", userHandler.Login)
 

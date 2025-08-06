@@ -23,7 +23,7 @@ definitions:
       username:
         type: string
     type: object
-  http.LoginRequest:
+  handler.LoginRequest:
     properties:
       password:
         example: securepassword
@@ -37,7 +37,7 @@ definitions:
     - password
     - username
     type: object
-  http.RegistrationRequest:
+  handler.RegistrationRequest:
     properties:
       email:
         example: username@example.com
@@ -72,6 +72,18 @@ info:
   version: 0.0.1
 paths:
   /:
+    get:
+      description: Get information about currently logged in account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.User'
+      summary: User info
+      tags:
+      - accounts
     post:
       consumes:
       - application/json
@@ -82,7 +94,7 @@ paths:
         name: registration_request
         required: true
         schema:
-          $ref: '#/definitions/http.RegistrationRequest'
+          $ref: '#/definitions/handler.RegistrationRequest'
       produces:
       - application/json
       responses:
@@ -104,7 +116,7 @@ paths:
         name: login_request
         required: true
         schema:
-          $ref: '#/definitions/http.LoginRequest'
+          $ref: '#/definitions/handler.LoginRequest'
       produces:
       - application/json
       responses:

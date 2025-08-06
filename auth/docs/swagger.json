@@ -17,6 +17,24 @@
     "host": "localhost:8080",
     "paths": {
         "/": {
+            "get": {
+                "description": "Get information about currently logged in account",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "User info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.User"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Register a new account",
                 "consumes": [
@@ -36,7 +54,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.RegistrationRequest"
+                            "$ref": "#/definitions/handler.RegistrationRequest"
                         }
                     }
                 ],
@@ -70,7 +88,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.LoginRequest"
+                            "$ref": "#/definitions/handler.LoginRequest"
                         }
                     }
                 ],
@@ -123,7 +141,7 @@
                 }
             }
         },
-        "http.LoginRequest": {
+        "handler.LoginRequest": {
             "type": "object",
             "required": [
                 "password",
@@ -142,7 +160,7 @@
                 }
             }
         },
-        "http.RegistrationRequest": {
+        "handler.RegistrationRequest": {
             "type": "object",
             "required": [
                 "email",

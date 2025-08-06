@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	"github.com/zednotdead/dinners/auth/internal/server"
+	"github.com/zednotdead/dinners/auth/internal/adapter/http/server"
 )
 
 func Server() {

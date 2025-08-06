@@ -12,4 +12,4 @@ fmt-docs:
 	swag fmt
 
 gen-openapi:
-	swag init -g internal/server/NewServer.go
+	swag init -g internal/adapter/http/server/NewServer.go

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/zednotdead/dinners/auth/internal/domain/models"
 	"github.com/zednotdead/dinners/auth/internal/port/user/repository"
 	"golang.org/x/crypto/bcrypt"
@@ -60,6 +61,16 @@ func (us *UserService) LogIn(ctx context.Context, user *models.User, password st
 
 	if !hashMatches {
 		return nil, errors.New("Incorrect password")
+	}
+
+	return user, nil
+}
+
+func (us *UserService) Info(ctx context.Context, id uuid.UUID) (*models.User, error) {
+	user, err := us.userRepo.GetUserByID(ctx, id)
+
+	if err != nil {
+		return nil, err
 	}
 
 	return user, nil

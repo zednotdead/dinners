@@ -24,6 +24,24 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/": {
+            "get": {
+                "description": "Get information about currently logged in account",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "User info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.User"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Register a new account",
                 "consumes": [
@@ -43,7 +61,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.RegistrationRequest"
+                            "$ref": "#/definitions/handler.RegistrationRequest"
                         }
                     }
                 ],
@@ -77,7 +95,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.LoginRequest"
+                            "$ref": "#/definitions/handler.LoginRequest"
                         }
                     }
                 ],
@@ -130,7 +148,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.LoginRequest": {
+        "handler.LoginRequest": {
             "type": "object",
             "required": [
                 "password",
@@ -149,7 +167,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.RegistrationRequest": {
+        "handler.RegistrationRequest": {
             "type": "object",
             "required": [
                 "email",
