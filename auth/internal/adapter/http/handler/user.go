@@ -9,6 +9,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/oapi-codegen/runtime/types"
+	"github.com/zednotdead/dinners/auth/internal/adapter/http/api"
 	"github.com/zednotdead/dinners/auth/internal/domain/models"
 	"github.com/zednotdead/dinners/auth/internal/service"
 )
@@ -16,35 +18,21 @@ import (
 var validate = validator.New()
 
 type UserHandler struct {
-	svc *service.UserService
-	jwt *service.JwtService
+	svc        *service.UserService
+	jwt        *service.JwtService
+	expiration time.Duration
 }
 
 func NewUserHandler(svc *service.UserService, jwtsvc *service.JwtService) *UserHandler {
 	return &UserHandler{
-		svc: svc,
-		jwt: jwtsvc,
+		svc:        svc,
+		jwt:        jwtsvc,
+		expiration: 24 * time.Hour,
 	}
 }
 
-type RegistrationRequest struct {
-	Username string `json:"username" example:"username" validate:"required,min=5"`
-	Email    string `json:"email" example:"username@example.com" validate:"required,email"`
-	Password string `json:"password" example:"securepassword" validate:"required,min=5"`
-}
-
-// Register godoc
-//
-//	@Summary		Register
-//	@Description	Register a new account
-//	@Tags			accounts
-//	@Accept			json
-//	@Produce		json
-//	@Param			registration_request	body		RegistrationRequest	true	"Registration request body"
-//	@Success		201						{object}	models.User
-//	@Router			/ [post]
-func (uh *UserHandler) Register(ctx *gin.Context) {
-	registration := new(RegistrationRequest)
+func (uh *UserHandler) Post(ctx *gin.Context) {
+	registration := new(api.RegistrationRequest)
 
 	if err := ctx.BindJSON(registration); err != nil {
 		ctx.Error(err)
@@ -59,7 +47,7 @@ func (uh *UserHandler) Register(ctx *gin.Context) {
 
 	user := models.User{
 		Username: registration.Username,
-		Email:    registration.Email,
+		Email:    string(registration.Email),
 	}
 
 	u, _, err := uh.svc.Register(ctx.Request.Context(), &user, registration.Password)
@@ -69,31 +57,17 @@ func (uh *UserHandler) Register(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(201, u)
+	api.Post201JSONResponse{
+		Success:  true,
+		Id:       u.ID,
+		Avatar:   &u.Avatar,
+		Email:    types.Email(u.Avatar),
+		Username: u.Username,
+	}.VisitPostResponse(ctx.Writer)
 }
 
-type LoginRequest struct {
-	Username string `json:"username" example:"username" validate:"required,min=5"`
-	Password string `json:"password" example:"securepassword" validate:"required,min=5"`
-}
-
-type LoginResponse struct {
-	Token   string `json:"token"`
-	Expires string `json:"expires"`
-}
-
-// Login godoc
-//
-//	@Summary		Log in
-//	@Description	Log in to the account
-//	@Tags			accounts
-//	@Accept			json
-//	@Produce		json
-//	@Param			login_request	body		LoginRequest	true	"Login request object"
-//	@Success		200				{object}	models.User
-//	@Router			/login [post]
-func (uh *UserHandler) Login(ctx *gin.Context) {
-	login := new(LoginRequest)
+func (uh *UserHandler) PostLogin(ctx *gin.Context) {
+	login := new(api.LoginRequest)
 	if err := ctx.BindJSON(&login); err != nil {
 		ctx.Error(err)
 		return
@@ -116,7 +90,7 @@ func (uh *UserHandler) Login(ctx *gin.Context) {
 	}
 
 	issuedAt := time.Now()
-	expiresAt := issuedAt.Add(time.Hour)
+	expiresAt := issuedAt.Add(uh.expiration)
 
 	claims := jwt.RegisteredClaims{
 		Subject:   u.ID.String(),
@@ -131,21 +105,14 @@ func (uh *UserHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, LoginResponse{
+	api.PostLogin200JSONResponse{
+		Success: true,
 		Token:   token,
-		Expires: expiresAt.Format(time.RFC1123),
-	})
+		Expires: expiresAt,
+	}.VisitPostLoginResponse(ctx.Writer)
 }
 
-// Info godoc
-//
-//	@Summary		User info
-//	@Description	Get information about currently logged in account
-//	@Tags			accounts
-//	@Produce		json
-//	@Success		200	{object}	models.User
-//	@Router			/ [get]
-func (uh *UserHandler) Info(ctx *gin.Context) {
+func (uh *UserHandler) Get(ctx *gin.Context) {
 	authHeader := strings.Split(ctx.Request.Header.Get("Authorization"), "Bearer ")
 	if len(authHeader) != 2 {
 		ctx.Error(errors.New("Malformed Authorization header"))
@@ -165,11 +132,17 @@ func (uh *UserHandler) Info(ctx *gin.Context) {
 		return
 	}
 
-	user, err := uh.svc.Info(ctx, id)
+	u, err := uh.svc.Info(ctx, id)
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	ctx.JSON(200, user)
+	api.Get200JSONResponse{
+		Id:       u.ID,
+		Username: u.Username,
+		Email:    types.Email(u.Email),
+		Avatar:   &u.Avatar,
+		Success:  true,
+	}.VisitGetResponse(ctx.Writer)
 }

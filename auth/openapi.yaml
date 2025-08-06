@@ -1,0 +1,154 @@
+openapi: "3.1.1"
+info:
+  title: Dinners Auth
+  version: 0.0.1
+servers:
+  - url: localhost:8080
+components:
+  schemas:
+    GenericResponse:
+      type: object
+      additionalProperties: false
+      description: Generic response
+      properties: 
+        success:
+          type: boolean
+      required:
+        - success
+    User:
+      type: object
+      additionalProperties: false
+      properties: 
+        id:
+          type: string
+          format: uuid
+          examples:
+            - 00000000-0000-0000-0000-000000000000
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        avatar:
+          type: string
+      required:
+        - id
+        - email
+        - username
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      description: Login request object
+      properties: 
+        username:
+          type: string
+          minLength: 5
+          examples:
+            - username
+        password:
+          type: string
+          minLength: 5
+          examples:
+            - hunter2
+      required:
+        - username
+        - password
+    RegistrationRequest:
+      type: object
+      additionalProperties: false
+      description: Registration request
+      properties: 
+        username:
+          type: string
+          minLength: 5
+          examples:
+            - username
+        email:
+          type: string
+          format: email
+          examples:
+            - username@example.com
+        password:
+          type: string
+          minLength: 5
+          examples:
+            - hunter2
+      required:
+        - username
+        - password
+        - email
+  securitySchemes:
+    BearerAuth:
+      type: http
+      bearerFormat: jwt
+      scheme: bearer
+
+paths:
+  /:
+    get:
+      summary: User information
+      security:
+        - BearerAuth: []
+      deprecated: false
+      responses:
+        "200":
+          description: "The user is logged in and information about him is received"
+          content:
+            "application/json":
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/GenericResponse"
+                  - $ref: "#/components/schemas/User"
+    post:
+      summary: Register a new account
+      deprecated: false
+      security: []
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/RegistrationRequest"
+      responses:
+        "201":
+          description: "User has been successfully created."
+          content:
+            "application/json":
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/GenericResponse"
+                  - $ref: "#/components/schemas/User"
+  /login:
+    post:
+      summary: Log in
+      security: []
+      deprecated: false
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: "User is successfully logged in."
+          content:
+            "application/json":
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/GenericResponse"
+                  - type: object
+                    additionalProperties: false
+                    properties: 
+                      token:
+                        type: string
+                        format: jwt
+                        examples:
+                          - "ey..."
+                      expires:
+                        type: string
+                        format: date-time
+                        examples:
+                          - "2025-08-06T19:59:42.040952965+02:00"
+                    required:
+                      - token
+                      - expires
