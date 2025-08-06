@@ -20,9 +20,9 @@ func NewCredentialRepository(db *gorm.DB) *CredentialRepository {
 }
 
 func (repo *CredentialRepository) CreateCredential(ctx context.Context, credential *domain.Credential) (*domain.Credential, error) {
-	credModel := models.Credential {
+	credModel := models.Credential{
 		PasswordHash: credential.PasswordHash,
-		UserID: credential.UserID,
+		UserID:       credential.UserID,
 	}
 
 	err := gorm.G[models.Credential](repo.DB).Create(ctx, &credModel)

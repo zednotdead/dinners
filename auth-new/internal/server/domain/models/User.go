@@ -5,9 +5,9 @@ import (
 )
 
 type User struct {
-	ID       uuid.UUID
-	Username string
-	Email    string
-	Avatar   string
+	ID          uuid.UUID
+	Username    string
+	Email       string
+	Avatar      string
 	Credentials []Credential
 }

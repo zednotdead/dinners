@@ -2,8 +2,12 @@
 _.file = '.env'
 
 [tools]
-air = "latest"
+air = "1.62.0"
 atlas = "v0.35.0"
+make = "4.4.1"
 mc = "2025-05-21T01-59-54Z"
 node = "22"
-"ubi:pamburus/hl" = "latest"
+pkl = "0.29.0"
+swag = "v1.16.6"
+"ubi:pamburus/hl" = "0.31.2"
+hk = "1.2.2"

@@ -7,10 +7,10 @@ import (
 
 type User struct {
 	gorm.Model
-	ID       uuid.UUID `gorm:"primaryKey"`
-	Username string    `gorm:"unique;notNull"`
-	Email    string    `gorm:"unique"`
-	Avatar   string
+	ID          uuid.UUID `gorm:"primaryKey"`
+	Username    string    `gorm:"unique;notNull"`
+	Email       string    `gorm:"unique"`
+	Avatar      string
 	Credentials []Credential
 }
 

@@ -55,6 +55,15 @@ type LoginRequest struct {
 	Password string
 }
 
+// ShowAccount godoc
+//
+//	@Summary		Log in
+//	@Description	Log in to the account
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	models.User
+//	@Router			/login [get]
 func (uh *UserHandler) Login(ctx *gin.Context) {
 	tracex := trace.SpanFromContext(ctx)
 	b := otel.GetTextMapPropagator().Extract(ctx, propagation.HeaderCarrier(ctx.Request.Header))

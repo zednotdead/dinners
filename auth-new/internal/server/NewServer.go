@@ -2,12 +2,13 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	sloggin "github.com/samber/slog-gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	handler "github.com/zednotdead/dinners/auth/internal/adapter/handler/http"
 	"github.com/zednotdead/dinners/auth/internal/adapter/storage/postgres/repository"
 	"github.com/zednotdead/dinners/auth/internal/server/service"
@@ -16,6 +17,9 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormTrace "gorm.io/plugin/opentelemetry/tracing"
+
+	// Needed for Swagger to work
+	_ "github.com/zednotdead/dinners/auth/docs"
 )
 
 // ErrorHandler captures errors and returns a consistent JSON error response
@@ -37,6 +41,21 @@ func ErrorHandler() gin.HandlerFunc {
 	}
 }
 
+//	@title			Dinners Auth
+//	@version		0.0.1
+//	@description	Authentication service for the Dinners app
+
+//	@contact.name	API Support
+//	@contact.url	http://deepdi.sh/support
+//	@contact.email	me@zed.gay
+
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+
+//	@host	localhost:8080
+
+// @externalDocs.description	OpenAPI
+// @externalDocs.url			https://swagger.io/resources/open-api/
 func NewServer(ctx context.Context) *Server {
 	app := gin.New()
 
@@ -78,6 +97,8 @@ func NewServer(ctx context.Context) *Server {
 		}).
 		POST("/", userHandler.Register).
 		POST("/login", userHandler.Login)
+
+	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return &Server{
 		App:  app,
