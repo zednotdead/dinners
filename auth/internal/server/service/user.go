@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/zednotdead/dinners/auth/internal/port/user/repository"
 	"github.com/zednotdead/dinners/auth/internal/server/domain/models"
@@ -43,6 +44,22 @@ func (us *UserService) LogIn(ctx context.Context, user *models.User, password st
 	user, err := us.userRepo.GetUserByUsername(ctx, user.Username)
 	if err != nil {
 		return nil, err
+	}
+
+	hashMatches := false
+
+	for _, v := range user.Credentials {
+		err := bcrypt.CompareHashAndPassword([]byte(v.PasswordHash), []byte(password))
+		if err != nil {
+			continue
+		} else {
+			hashMatches = true
+			break
+		}
+	}
+
+	if !hashMatches {
+		return nil, errors.New("Incorrect password")
 	}
 
 	return user, nil
