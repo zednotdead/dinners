@@ -6,7 +6,7 @@ import (
 
 	"github.com/jinzhu/copier"
 	"github.com/zednotdead/dinners/auth/internal/adapter/storage/postgres/repository/models"
-	domain "github.com/zednotdead/dinners/auth/internal/server/domain/models"
+	domain "github.com/zednotdead/dinners/auth/internal/domain/models"
 	"gorm.io/gorm"
 )
 

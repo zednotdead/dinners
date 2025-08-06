@@ -51,7 +51,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_server_domain_models.User"
+                            "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.User"
                         }
                     }
                 }
@@ -85,7 +85,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_server_domain_models.User"
+                            "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.User"
                         }
                     }
                 }
@@ -93,7 +93,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_zednotdead_dinners_auth_internal_server_domain_models.Credential": {
+        "github_com_zednotdead_dinners_auth_internal_domain_models.Credential": {
             "type": "object",
             "properties": {
                 "id": {
@@ -107,7 +107,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_zednotdead_dinners_auth_internal_server_domain_models.User": {
+        "github_com_zednotdead_dinners_auth_internal_domain_models.User": {
             "type": "object",
             "properties": {
                 "avatar": {
@@ -116,7 +116,7 @@ const docTemplate = `{
                 "credentials": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_server_domain_models.Credential"
+                        "$ref": "#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.Credential"
                     }
                 },
                 "email": {
@@ -132,19 +132,30 @@ const docTemplate = `{
         },
         "http.LoginRequest": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
                     "type": "string",
+                    "minLength": 5,
                     "example": "securepassword"
                 },
                 "username": {
                     "type": "string",
+                    "minLength": 5,
                     "example": "username"
                 }
             }
         },
         "http.RegistrationRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
             "properties": {
                 "email": {
                     "type": "string",
@@ -152,10 +163,12 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string",
+                    "minLength": 5,
                     "example": "securepassword"
                 },
                 "username": {
                     "type": "string",
+                    "minLength": 5,
                     "example": "username"
                 }
             }

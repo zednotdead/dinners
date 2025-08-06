@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/zednotdead/dinners/auth/internal/domain/models"
 	"github.com/zednotdead/dinners/auth/internal/port/user/repository"
-	"github.com/zednotdead/dinners/auth/internal/server/domain/models"
 	"golang.org/x/crypto/bcrypt"
 )
 

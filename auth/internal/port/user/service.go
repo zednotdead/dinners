@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/zednotdead/dinners/auth/internal/server/domain/models"
+	"github.com/zednotdead/dinners/auth/internal/domain/models"
 )
 
 type UserService interface {

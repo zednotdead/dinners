@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/zednotdead/dinners/auth/internal/server/domain/models"
+	"github.com/zednotdead/dinners/auth/internal/domain/models"
 )
 
 type CredentialRepository interface {

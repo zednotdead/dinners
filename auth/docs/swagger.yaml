@@ -1,5 +1,5 @@
 definitions:
-  github_com_zednotdead_dinners_auth_internal_server_domain_models.Credential:
+  github_com_zednotdead_dinners_auth_internal_domain_models.Credential:
     properties:
       id:
         type: string
@@ -8,13 +8,13 @@ definitions:
       userID:
         type: string
     type: object
-  github_com_zednotdead_dinners_auth_internal_server_domain_models.User:
+  github_com_zednotdead_dinners_auth_internal_domain_models.User:
     properties:
       avatar:
         type: string
       credentials:
         items:
-          $ref: '#/definitions/github_com_zednotdead_dinners_auth_internal_server_domain_models.Credential'
+          $ref: '#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.Credential'
         type: array
       email:
         type: string
@@ -27,10 +27,15 @@ definitions:
     properties:
       password:
         example: securepassword
+        minLength: 5
         type: string
       username:
         example: username
+        minLength: 5
         type: string
+    required:
+    - password
+    - username
     type: object
   http.RegistrationRequest:
     properties:
@@ -39,10 +44,16 @@ definitions:
         type: string
       password:
         example: securepassword
+        minLength: 5
         type: string
       username:
         example: username
+        minLength: 5
         type: string
+    required:
+    - email
+    - password
+    - username
     type: object
 externalDocs:
   description: OpenAPI
@@ -78,7 +89,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_zednotdead_dinners_auth_internal_server_domain_models.User'
+            $ref: '#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.User'
       summary: Register
       tags:
       - accounts
@@ -100,7 +111,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_zednotdead_dinners_auth_internal_server_domain_models.User'
+            $ref: '#/definitions/github_com_zednotdead_dinners_auth_internal_domain_models.User'
       summary: Log in
       tags:
       - accounts
