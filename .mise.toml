@@ -1,5 +1,8 @@
 [env]
 _.file = '.env'
+_.path = [
+    "{{config_root}}/node_modules/.bin",
+]
 
 [tools]
 air = "1.62.0"
