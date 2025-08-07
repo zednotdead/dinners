@@ -1,15 +1,11 @@
 'use server';
 
-import { cookies } from 'next/headers';
-import { getUser as getUserAPI } from '../api/get';
+import { api } from '@/lib/api';
 
 export async function getUser() {
-  const c = await cookies();
-
-  const loginCookie = c.get('auth');
-
-  if (loginCookie) {
-    return await getUserAPI(loginCookie.value);
+  const user = await api.GET('/');
+  if (user.data) {
+    return user.data;
   }
   return undefined;
 }

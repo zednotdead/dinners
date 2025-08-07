@@ -1,7 +1,12 @@
 procs:
-  auth:
+  auth:server:
     shell: make dev
     cwd: auth
+  auth:client:
+    shell: bun run watch
+    cwd: auth/client
+  auth:openapi:
+    shell: mise watch -w ./auth/openapi.yaml openapi
   frontend:
     shell: bun run dev
     cwd: frontend

@@ -26,13 +26,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getUser();
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <FrontendObservability />
-        <AuthContextProvider initialUser={await getUser()}>
+        <AuthContextProvider initialUser={user}>
           <Navbar />
           {children}
         </AuthContextProvider>

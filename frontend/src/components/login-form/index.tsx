@@ -19,7 +19,7 @@ import { AuthContext } from '@/context/auth';
 import { IncorrectPasswordError, UnknownUserError } from '@/lib/api/login/errors';
 
 const formSchema = z.object({
-  email: z.email({ message: 'You must use a valid email address' }),
+  username: z.string().min(5),
   password: z.string().min(8, {
     message: 'Password must be at least 8 characters.',
   }),
@@ -36,13 +36,13 @@ export function LoginForm({ successfulLogin }: Props) {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
     },
   });
 
   function onSubmit(values: LoginFormValues) {
-    logIn(values.email, values.password)
+    logIn(values.username, values.password)
       .then(() => {
         successfulLogin();
       })
@@ -52,7 +52,7 @@ export function LoginForm({ successfulLogin }: Props) {
         if (e instanceof IncorrectPasswordError) {
           form.setError('password', { type: e.code.toString(), message: e.message });
         } else if (e instanceof UnknownUserError) {
-          form.setError('email', { type: e.code.toString(), message: e.message });
+          form.setError('username', { type: e.code.toString(), message: e.message });
         } else {
           form.setError('root', {
             type: '500',
@@ -67,15 +67,14 @@ export function LoginForm({ successfulLogin }: Props) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="dinnersenjoyer@example.com"
-                  type="email"
-                  autoComplete="email"
+                  placeholder="dinnersenjoyer"
+                  autoComplete="username"
                   {...field}
                 />
               </FormControl>

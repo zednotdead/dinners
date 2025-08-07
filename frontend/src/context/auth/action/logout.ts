@@ -1,7 +1,6 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { logOut as logOutAPI } from '../api/logout';
 
 export async function logOut() {
   const c = await cookies();
@@ -9,7 +8,8 @@ export async function logOut() {
   const loginCookie = c.get('auth');
 
   if (loginCookie) {
-    return await logOutAPI(loginCookie.value);
+    c.delete('auth');
+    return true;
   }
 
   return false;

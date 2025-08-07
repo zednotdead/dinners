@@ -7,12 +7,9 @@ import { redirect } from 'next/navigation';
 import logger from '@/lib/logger';
 import { faro } from '@grafana/faro-web-sdk';
 import { IncorrectPasswordError, UnknownLoginError, UnknownUserError } from '@/lib/api/login/errors';
+import { components } from '@/lib/api/v1';
 
-export interface User {
-  id: string;
-  username: string;
-  avatar?: string;
-}
+export type User = components['schemas']['User'];
 
 interface AuthContextValue {
   user?: User;

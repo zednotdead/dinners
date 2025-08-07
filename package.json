@@ -4,17 +4,16 @@
     "workspaces": [
         "frontend",
         "eslint-config-zed",
-        "components"
+        "components",
+        "auth/client"
     ],
-    "dependencies": {
-        "mprocs": "^0.7.3"
-    },
     "scripts": {
         "dev": "mprocs",
         "lint": "bun run --filter='*' lint",
         "lint:fix": "bun run --filter='*' lint"
     },
     "devDependencies": {
-        "@openapitools/openapi-generator-cli": "^2.21.4"
+        "@antfu/ni": "^25.0.0",
+        "mprocs": "^0.7.3"
     }
 }

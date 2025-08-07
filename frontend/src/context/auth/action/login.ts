@@ -1,28 +1,32 @@
 'use server';
 
+import { api } from '@/lib/api';
 import { cookies } from 'next/headers';
-import { logIn as logInAPI } from '@/lib/api/login';
-import { getUser } from './get';
-import { BasePasswordError } from '@/lib/api/login/errors';
 
-export async function logIn(email: string, password: string) {
+export async function logIn(username: string, password: string) {
   try {
-    const accessToken = await logInAPI(email, password);
+    const res = await api.POST('/login', { body: { username, password } });
     const c = await cookies();
-    c.set('auth', accessToken, { secure: true, httpOnly: true });
 
-    const user = await getUser();
+    if (res.error) throw res.error;
+
+    c.set('auth', res.data.token, { secure: true, httpOnly: true });
+
+    const userRes = await api.GET('/');
+    if (userRes.error && !userRes.error.success) {
+      throw new Error(userRes.error.message);
+    }
+    const user = userRes.data;
 
     return {
       user,
       code: 200,
     };
   } catch (e) {
-    if (e instanceof BasePasswordError) {
-      console.log(e);
+    if (e instanceof Error) {
       return {
         error: e.message,
-        code: e.code,
+        code: 400,
       };
     }
 

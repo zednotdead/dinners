@@ -15,6 +15,17 @@ components:
           type: boolean
       required:
         - success
+    GenericError:
+      type: object
+      additionalProperties: false
+      description: Generic response
+      properties: 
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
     User:
       type: object
       additionalProperties: false
@@ -99,6 +110,12 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/GenericResponse"
                   - $ref: "#/components/schemas/User"
+        "500":
+          description: "An unexpected error occured"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GenericError"
     post:
       summary: Register a new account
       deprecated: false
@@ -117,6 +134,12 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/GenericResponse"
                   - $ref: "#/components/schemas/User"
+        "500":
+          description: "An unexpected error has occured"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GenericError"
   /login:
     post:
       summary: Log in
@@ -152,3 +175,10 @@ paths:
                     required:
                       - token
                       - expires
+        "500":
+          description: "An unexpected error has occured"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GenericError"
+

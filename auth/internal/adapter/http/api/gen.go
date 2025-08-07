@@ -19,6 +19,12 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
+// GenericError Generic response
+type GenericError struct {
+	Message *string `json:"message,omitempty"`
+	Success bool    `json:"success"`
+}
+
 // GenericResponse Generic response
 type GenericResponse struct {
 	Success bool `json:"success"`
@@ -168,6 +174,15 @@ func (response Get200JSONResponse) VisitGetResponse(w http.ResponseWriter) error
 	return json.NewEncoder(w).Encode(response)
 }
 
+type Get500JSONResponse GenericError
+
+func (response Get500JSONResponse) VisitGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PostRequestObject struct {
 	Body *PostJSONRequestBody
 }
@@ -191,6 +206,15 @@ func (response Post201JSONResponse) VisitPostResponse(w http.ResponseWriter) err
 	return json.NewEncoder(w).Encode(response)
 }
 
+type Post500JSONResponse GenericError
+
+func (response Post500JSONResponse) VisitPostResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PostLoginRequestObject struct {
 	Body *PostLoginJSONRequestBody
 }
@@ -208,6 +232,15 @@ type PostLogin200JSONResponse struct {
 func (response PostLogin200JSONResponse) VisitPostLoginResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLogin500JSONResponse GenericError
+
+func (response PostLogin500JSONResponse) VisitPostLoginResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
 
 	return json.NewEncoder(w).Encode(response)
 }

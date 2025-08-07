@@ -18,6 +18,11 @@ local lint = new Mapping<String, Step> {
         check = "bun run lint"
         fix = "bun run lint:fix"
     }
+    ["components"] {
+        dir = "components"
+        check = "bun run lint"
+        fix = "bun run lint:fix"
+    }
     ...miscLinters
 }
 

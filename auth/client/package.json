@@ -1,0 +1,30 @@
+{
+  "$schema": "https://www.schemastore.org/package.json",
+  "name": "@dinners/auth-client",
+  "type": "module",
+  "source": "./index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/module.js",
+  "types": "dist/types.d.ts",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "scripts": {
+    "gen:openapi": "openapi-typescript ../openapi.yaml -o ./definition.ts",
+    "build": "parcel build",
+    "watch": "parcel watch",
+    "check": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.14.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.30.1",
+    "eslint-config-zed": "workspace:*",
+    "@types/bun": "latest",
+    "openapi-typescript": "^7.8.0",
+    "parcel": "^2.15.4"
+  }
+}

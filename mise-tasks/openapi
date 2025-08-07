@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #MISE description="Generate OpenAPI definitions"
 
-cd auth && make openapi
+cd auth
+make openapi
+cd ..
 
 # vim: ft=bash
