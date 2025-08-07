@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	sloggin "github.com/samber/slog-gin"
+	valkey "github.com/valkey-io/valkey-go"
 	"github.com/zednotdead/dinners/auth/internal/adapter/http/api"
 	"github.com/zednotdead/dinners/auth/internal/adapter/http/handler/user"
 	"github.com/zednotdead/dinners/auth/internal/adapter/storage/postgres/repository"
@@ -39,6 +40,7 @@ func ErrorHandler() gin.HandlerFunc {
 }
 
 func NewServer(ctx context.Context) *Server {
+	gin.SetMode(gin.ReleaseMode)
 	app := gin.New()
 
 	log := slog.New(otelslog.NewHandler("dinners/auth"))
@@ -54,8 +56,17 @@ func NewServer(ctx context.Context) *Server {
 
 	app.Use(sloggin.NewWithConfig(log, config))
 
-	db, err := gorm.Open(postgres.Open("host=localhost user=postgres password=postgres dbname=auth port=5432 sslmode=disable TimeZone=Europe/Warsaw"))
+	db, err := gorm.Open(
+		postgres.Open("host=localhost user=postgres password=postgres dbname=auth port=5432 sslmode=disable TimeZone=Europe/Warsaw"),
+		&gorm.Config{
+			TranslateError: true,
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
 
+	client, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{"localhost:6379"}})
 	if err != nil {
 		panic(err)
 	}
@@ -69,7 +80,7 @@ func NewServer(ctx context.Context) *Server {
 	userRepo := repository.NewUserRepository(db)
 	credRepo := repository.NewCredentialRepository(db)
 
-	cacheService := redis.NewRedisCache()
+	cacheService := redis.NewRedisCache(client)
 	jwtService := service.NewJwtService("zażółć gęślą jaźń")
 
 	userService := service.NewUserService(userRepo, credRepo, cacheService)

@@ -1,10 +1,13 @@
 package user
 
 import (
+	"errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/runtime/types"
 	"github.com/zednotdead/dinners/auth/internal/adapter/http/api"
 	"github.com/zednotdead/dinners/auth/internal/domain/models"
+	"github.com/zednotdead/dinners/auth/internal/port/user"
 )
 
 func (uh *UserHandler) Post(ctx *gin.Context) {
@@ -27,7 +30,6 @@ func (uh *UserHandler) Post(ctx *gin.Context) {
 	}
 
 	u, _, err := uh.svc.Register(ctx.Request.Context(), &user, registration.Password)
-
 	if err != nil {
 		handleErrorRegister(ctx, err)
 		return
@@ -44,8 +46,15 @@ func (uh *UserHandler) Post(ctx *gin.Context) {
 
 func handleErrorRegister(ctx *gin.Context, err error) {
 	message := err.Error()
-	api.Post500JSONResponse{
-		Success: false,
-		Message: &message,
-	}.VisitPostResponse(ctx.Writer)
+	if errors.Is(err, user.UserServiceConflictError) {
+		api.Post409JSONResponse{
+			Success: false,
+			Message: &message,
+		}.VisitPostResponse(ctx.Writer)
+	} else {
+		api.Post500JSONResponse{
+			Success: false,
+			Message: &message,
+		}.VisitPostResponse(ctx.Writer)
+	}
 }

@@ -141,6 +141,12 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/GenericResponse"
                   - $ref: "#/components/schemas/User"
+        "409":
+          description: "Attempted to create a user with data that already exists"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GenericError"
         "500":
           description: "An unexpected error has occured"
           content:

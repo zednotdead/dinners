@@ -1,13 +1,13 @@
 'use server';
 
+import { api } from '@/lib/api';
 import { cookies } from 'next/headers';
 
 export async function logOut() {
   const c = await cookies();
 
-  const loginCookie = c.get('auth');
-
-  if (loginCookie) {
+  const res = await api.DELETE('/');
+  if (res.data?.success) {
     c.delete('auth');
     return true;
   }

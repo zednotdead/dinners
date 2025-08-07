@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import logger from '@/lib/logger';
 import { faro } from '@grafana/faro-web-sdk';
 import { IncorrectPasswordError, UnknownLoginError, UnknownUserError } from '@/lib/api/login/errors';
-import { components } from '@/lib/api/v1';
+import { components } from '@dinners/auth-client';
 
 export type User = components['schemas']['User'];
 

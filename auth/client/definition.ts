@@ -66,6 +66,13 @@ export interface paths {
             'application/json': components['schemas']['GenericResponse'] & components['schemas']['User'];
           };
         };
+        /** @description Attempted to create a user with data that already exists */
+        409: {
+          headers: Record<string, unknown>;
+          content: {
+            'application/json': components['schemas']['GenericError'];
+          };
+        };
         /** @description An unexpected error has occured */
         500: {
           headers: Record<string, unknown>;

@@ -18,6 +18,17 @@ func (uh *UserHandler) Get(ctx *gin.Context) {
 	}
 	token := authHeader[1]
 
+	blacklisted, err := uh.cache.IsJWTOnBlacklist(ctx, token)
+	if err != nil {
+		handleErrorInfo(ctx, err)
+		return
+	}
+
+	if blacklisted {
+		handleErrorInfo(ctx, UserHandlerNotLoggedInError)
+		return
+	}
+
 	claims, err := uh.jwt.DecodeToken(token)
 	if err != nil {
 		handleErrorInfo(ctx, err)

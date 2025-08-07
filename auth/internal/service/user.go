@@ -10,6 +10,7 @@ import (
 	userPort "github.com/zednotdead/dinners/auth/internal/port/user"
 	"github.com/zednotdead/dinners/auth/internal/port/user/repository"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type UserService struct {
@@ -33,6 +34,9 @@ func NewUserService(
 func (us *UserService) Register(ctx context.Context, user *models.User, password string) (*models.User, *models.Credential, error) {
 	user, err := us.userRepo.CreateUser(ctx, user)
 	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, nil, userPort.UserServiceConflictError
+		}
 		return nil, nil, err
 	}
 

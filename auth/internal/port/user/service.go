@@ -18,4 +18,5 @@ type UserService interface {
 var (
 	UserServiceIncorrectPasswordError = errors.New("Incorrect password")
 	UserServiceUserNotFoundError      = errors.New("User with the given data was not found.")
+	UserServiceConflictError          = errors.New("Attempted to create a user with data for an already existing user")
 )

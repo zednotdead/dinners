@@ -16,6 +16,7 @@ swag = "1.16.6"
 hk = "1.2.2"
 mprocs = "0.7.3"
 watchexec = "2.3.2"
+redis-cli = "latest"
 
 [tasks]
 check = "hk check"

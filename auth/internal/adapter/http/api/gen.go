@@ -268,6 +268,15 @@ func (response Post201JSONResponse) VisitPostResponse(w http.ResponseWriter) err
 	return json.NewEncoder(w).Encode(response)
 }
 
+type Post409JSONResponse GenericError
+
+func (response Post409JSONResponse) VisitPostResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type Post500JSONResponse GenericError
 
 func (response Post500JSONResponse) VisitPostResponse(w http.ResponseWriter) error {
