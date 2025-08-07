@@ -8,8 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	sloggin "github.com/samber/slog-gin"
 	"github.com/zednotdead/dinners/auth/internal/adapter/http/api"
-	"github.com/zednotdead/dinners/auth/internal/adapter/http/handler"
+	"github.com/zednotdead/dinners/auth/internal/adapter/http/handler/user"
 	"github.com/zednotdead/dinners/auth/internal/adapter/storage/postgres/repository"
+	"github.com/zednotdead/dinners/auth/internal/adapter/storage/redis"
 	"github.com/zednotdead/dinners/auth/internal/service"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
@@ -67,9 +68,12 @@ func NewServer(ctx context.Context) *Server {
 
 	userRepo := repository.NewUserRepository(db)
 	credRepo := repository.NewCredentialRepository(db)
-	userService := service.NewUserService(userRepo, credRepo)
+
+	cacheService := redis.NewRedisCache()
 	jwtService := service.NewJwtService("zażółć gęślą jaźń")
-	userHandler := handler.NewUserHandler(userService, jwtService)
+
+	userService := service.NewUserService(userRepo, credRepo, cacheService)
+	userHandler := user.NewUserHandler(userService, jwtService, cacheService)
 
 	api.RegisterHandlers(app, userHandler)
 

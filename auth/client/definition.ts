@@ -28,6 +28,13 @@ export interface paths {
             'application/json': components['schemas']['GenericResponse'] & components['schemas']['User'];
           };
         };
+        /** @description User is not logged in */
+        401: {
+          headers: Record<string, unknown>;
+          content: {
+            'application/json': components['schemas']['GenericError'];
+          };
+        };
         /** @description An unexpected error occured */
         500: {
           headers: Record<string, unknown>;
@@ -68,7 +75,39 @@ export interface paths {
         };
       };
     };
-    delete?: never;
+    /** Log out */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The user has been logged out */
+        200: {
+          headers: Record<string, unknown>;
+          content: {
+            'application/json': components['schemas']['GenericResponse'];
+          };
+        };
+        /** @description User is not logged in */
+        401: {
+          headers: Record<string, unknown>;
+          content: {
+            'application/json': components['schemas']['GenericError'];
+          };
+        };
+        /** @description An unexpected error occured */
+        500: {
+          headers: Record<string, unknown>;
+          content: {
+            'application/json': components['schemas']['GenericError'];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -107,6 +146,20 @@ export interface paths {
               /** Format: date-time */
               expires: string;
             };
+          };
+        };
+        /** @description Incorrect password was provided. */
+        403: {
+          headers: Record<string, unknown>;
+          content: {
+            'application/json': components['schemas']['GenericError'];
+          };
+        };
+        /** @description User with the given username does not exist. */
+        404: {
+          headers: Record<string, unknown>;
+          content: {
+            'application/json': components['schemas']['GenericError'];
           };
         };
         /** @description An unexpected error has occured */

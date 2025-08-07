@@ -59,6 +59,9 @@ type PostLoginJSONRequestBody = LoginRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Log out
+	// (DELETE /)
+	Delete(c *gin.Context)
 	// User information
 	// (GET /)
 	Get(c *gin.Context)
@@ -78,6 +81,21 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
+
+// Delete operation middleware
+func (siw *ServerInterfaceWrapper) Delete(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.Delete(c)
+}
 
 // Get operation middleware
 func (siw *ServerInterfaceWrapper) Get(c *gin.Context) {
@@ -147,9 +165,44 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+	router.DELETE(options.BaseURL+"/", wrapper.Delete)
 	router.GET(options.BaseURL+"/", wrapper.Get)
 	router.POST(options.BaseURL+"/", wrapper.Post)
 	router.POST(options.BaseURL+"/login", wrapper.PostLogin)
+}
+
+type DeleteRequestObject struct {
+}
+
+type DeleteResponseObject interface {
+	VisitDeleteResponse(w http.ResponseWriter) error
+}
+
+type Delete200JSONResponse GenericResponse
+
+func (response Delete200JSONResponse) VisitDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type Delete401JSONResponse GenericError
+
+func (response Delete401JSONResponse) VisitDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type Delete500JSONResponse GenericError
+
+func (response Delete500JSONResponse) VisitDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type GetRequestObject struct {
@@ -170,6 +223,15 @@ type Get200JSONResponse struct {
 func (response Get200JSONResponse) VisitGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type Get401JSONResponse GenericError
+
+func (response Get401JSONResponse) VisitGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -236,6 +298,24 @@ func (response PostLogin200JSONResponse) VisitPostLoginResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PostLogin403JSONResponse GenericError
+
+func (response PostLogin403JSONResponse) VisitPostLoginResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostLogin404JSONResponse GenericError
+
+func (response PostLogin404JSONResponse) VisitPostLoginResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PostLogin500JSONResponse GenericError
 
 func (response PostLogin500JSONResponse) VisitPostLoginResponse(w http.ResponseWriter) error {
@@ -247,6 +327,9 @@ func (response PostLogin500JSONResponse) VisitPostLoginResponse(w http.ResponseW
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Log out
+	// (DELETE /)
+	Delete(ctx context.Context, request DeleteRequestObject) (DeleteResponseObject, error)
 	// User information
 	// (GET /)
 	Get(ctx context.Context, request GetRequestObject) (GetResponseObject, error)
@@ -268,6 +351,31 @@ func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareF
 type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
+}
+
+// Delete operation middleware
+func (sh *strictHandler) Delete(ctx *gin.Context) {
+	var request DeleteRequestObject
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.Delete(ctx, request.(DeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "Delete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(DeleteResponseObject); ok {
+		if err := validResponse.VisitDeleteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // Get operation middleware

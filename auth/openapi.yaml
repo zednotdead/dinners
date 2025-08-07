@@ -110,6 +110,13 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/GenericResponse"
                   - $ref: "#/components/schemas/User"
+        "401":
+          description: "User is not logged in"
+          content:
+            "application/json":
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/GenericError"
         "500":
           description: "An unexpected error occured"
           content:
@@ -136,6 +143,32 @@ paths:
                   - $ref: "#/components/schemas/User"
         "500":
           description: "An unexpected error has occured"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GenericError"
+    delete:
+      summary: Log out
+      deprecated: false
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: "The user has been logged out"
+          content:
+            "application/json":
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/GenericResponse"
+        "401":
+          description: "User is not logged in"
+          content:
+            "application/json":
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/GenericError"
+        "500":
+          description: "An unexpected error occured"
           content:
             "application/json":
               schema:
@@ -175,10 +208,21 @@ paths:
                     required:
                       - token
                       - expires
+        "403":
+          description: "Incorrect password was provided."
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GenericError"
+        "404":
+          description: "User with the given username does not exist."
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GenericError"
         "500":
           description: "An unexpected error has occured"
           content:
             "application/json":
               schema:
                 $ref: "#/components/schemas/GenericError"
-

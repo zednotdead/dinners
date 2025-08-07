@@ -8,6 +8,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/zednotdead/dinners/auth/internal/adapter/storage/postgres/repository/models"
 	domain "github.com/zednotdead/dinners/auth/internal/domain/models"
+	"github.com/zednotdead/dinners/auth/internal/port/user/repository"
 	"gorm.io/gorm"
 )
 
@@ -50,7 +51,7 @@ func (repo *UserRepository) GetUserByUsername(ctx context.Context, username stri
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, errors.New("User not found")
+			return nil, repository.UserRepositoryGetUserNotFoundError
 		}
 		return nil, result.Error
 	}
@@ -72,7 +73,7 @@ func (repo *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*dom
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, errors.New("User not found")
+			return nil, repository.UserRepositoryGetUserNotFoundError
 		}
 		return nil, result.Error
 	}
