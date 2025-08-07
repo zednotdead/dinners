@@ -7,11 +7,6 @@
         "components",
         "auth/client"
     ],
-    "scripts": {
-        "dev": "mprocs",
-        "lint": "bun run --filter='*' lint",
-        "lint:fix": "bun run --filter='*' lint"
-    },
     "devDependencies": {
         "@antfu/ni": "^25.0.0",
         "mprocs": "^0.7.3"
