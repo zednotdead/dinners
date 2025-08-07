@@ -44,13 +44,13 @@ func (uh *UserHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	u, err := uh.svc.Info(ctx, id)
+	u, err := uh.svc.Info(ctx.Request.Context(), id)
 	if err != nil {
 		handleErrorDelete(ctx, err)
 		return
 	}
 
-	err = uh.svc.Logout(ctx, u, token)
+	err = uh.svc.Logout(ctx.Request.Context(), u, token)
 	if err != nil {
 		handleErrorDelete(ctx, err)
 		return

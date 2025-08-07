@@ -3,6 +3,7 @@
 
 cd auth
 make openapi
+make fmt
 cd ..
 
 # vim: ft=bash

@@ -13,8 +13,8 @@ export default function FrontendObservability() {
       url: 'http://localhost:12347/collect',
       apiKey: 'secret',
       app: {
-        name: 'dinners/frontend/web',
-        namespace: 'dinners/frontend',
+        name: 'frontend/web',
+        namespace: 'dinners',
         version: '0.0.0',
       },
       instrumentations: [

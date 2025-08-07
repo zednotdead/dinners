@@ -13,8 +13,8 @@ import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 
 const sdk = new NodeSDK({
   resource: resourceFromAttributes({
-    [ATTR_SERVICE_NAME]: 'dinners/frontend/api',
-    'service.namespace': 'dinners/frontend',
+    [ATTR_SERVICE_NAME]: 'frontend/api',
+    'service.namespace': 'dinners',
   }),
   metricReader: new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter(),
@@ -23,7 +23,6 @@ const sdk = new NodeSDK({
     new BatchSpanProcessor(new OTLPTraceExporter()),
   ],
   logRecordProcessors: [
-    // @ts-expect-error type shenanigans, idk
     new BatchLogRecordProcessor(new OTLPLogExporter()),
   ],
   instrumentations: [

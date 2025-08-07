@@ -18,7 +18,7 @@ func (uh *UserHandler) Get(ctx *gin.Context) {
 	}
 	token := authHeader[1]
 
-	blacklisted, err := uh.cache.IsJWTOnBlacklist(ctx, token)
+	blacklisted, err := uh.cache.IsJWTOnBlacklist(ctx.Request.Context(), token)
 	if err != nil {
 		handleErrorInfo(ctx, err)
 		return
@@ -41,7 +41,7 @@ func (uh *UserHandler) Get(ctx *gin.Context) {
 		return
 	}
 
-	u, err := uh.svc.Info(ctx, id)
+	u, err := uh.svc.Info(ctx.Request.Context(), id)
 	if err != nil {
 		handleErrorInfo(ctx, err)
 		return

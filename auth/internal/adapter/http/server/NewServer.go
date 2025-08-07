@@ -43,9 +43,10 @@ func NewServer(ctx context.Context) *Server {
 	gin.SetMode(gin.ReleaseMode)
 	app := gin.New()
 
-	log := slog.New(otelslog.NewHandler("dinners/auth"))
 	app.Use(ErrorHandler())
 	app.Use(gin.Recovery())
+
+	app.Use(otelgin.Middleware("auth"))
 
 	config := sloggin.Config{
 		WithSpanID:        true,
@@ -54,6 +55,12 @@ func NewServer(ctx context.Context) *Server {
 		WithRequestHeader: true,
 	}
 
+	log := slog.New(
+		otelslog.NewHandler("auth", otelslog.WithAttributes(
+			attribName,
+			attribNamespace,
+		)),
+	)
 	app.Use(sloggin.NewWithConfig(log, config))
 
 	db, err := gorm.Open(
@@ -74,8 +81,6 @@ func NewServer(ctx context.Context) *Server {
 	if err := db.Use(gormTrace.NewPlugin()); err != nil {
 		panic(err)
 	}
-
-	app.Use(otelgin.Middleware("dinners/auth"))
 
 	userRepo := repository.NewUserRepository(db)
 	credRepo := repository.NewCredentialRepository(db)
